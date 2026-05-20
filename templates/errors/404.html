@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Página no encontrada (404){% endblock %}
+
+{% block content %}
+<div class="error-page" role="main">
+    <div class="error-card">
+        <div class="error-illustration" aria-hidden="true">
+            <span class="error-code">404</span>
+            <i class="fa-solid fa-plate-wheat error-icon"></i>
+        </div>
+        <h1 class="error-title">Esta mesa no existe</h1>
+        <p class="error-description">
+            La página que buscas no está disponible. Tal vez el plato ya fue retirado del menú,
+            o la dirección que escribiste no es correcta.
+        </p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary-custom">
+                <i class="fa-solid fa-house me-2" aria-hidden="true"></i>Volver al inicio
+            </a>
+            <a href="{% url 'menu:list' %}" class="btn btn-outline-custom">
+                <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Ver el menú
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

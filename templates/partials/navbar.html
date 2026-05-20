@@ -1,0 +1,155 @@
+<nav class="navbar navbar-expand-lg site-navbar" aria-label="Navegación principal">
+    <div class="container-fluid">
+
+        <a class="navbar-brand site-brand" href="/">
+            <span class="brand-icon" aria-hidden="true"><i class="fa-solid fa-utensils"></i></span>
+            <span class="brand-name">RestaurApp</span>
+        </a>
+
+        <button class="navbar-toggler site-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Abrir menú">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                {% if user.is_authenticated %}
+
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'menu:list' %}">
+                        <i class="fa-solid fa-book-open me-1" aria-hidden="true"></i>Menú
+                    </a>
+                </li>
+
+                {% if user.is_cliente or user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'orders:cart' %}">
+                        <i class="fa-solid fa-cart-shopping me-1" aria-hidden="true"></i>Mis Pedidos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'reservations:list' %}">
+                        <i class="fa-solid fa-calendar-check me-1" aria-hidden="true"></i>Mis Reservas
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_mesero or user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'orders:list' %}">
+                        <i class="fa-solid fa-receipt me-1" aria-hidden="true"></i>Pedidos Activos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="#">
+                        <i class="fa-solid fa-chair me-1" aria-hidden="true"></i>Mesas
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_admin %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-custom dropdown-toggle" href="#"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-gauge-high me-1" aria-hidden="true"></i>Admin
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-custom">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:index' %}">
+                                <i class="fa-solid fa-chart-line me-2" aria-hidden="true"></i>Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'inventory:list' %}">
+                                <i class="fa-solid fa-boxes-stacked me-2" aria-hidden="true"></i>Inventario
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/auth/user/">
+                                <i class="fa-solid fa-users me-2" aria-hidden="true"></i>Usuarios
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/">
+                                <i class="fa-solid fa-screwdriver-wrench me-2" aria-hidden="true"></i>Panel Django
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-2">
+
+                <li class="nav-item">
+                    <button class="btn-theme-toggle" id="themeToggle"
+                            title="Cambiar tema" aria-label="Cambiar tema claro/oscuro">
+                        <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
+                    </button>
+                </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-custom user-dropdown-toggle dropdown-toggle"
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="user-avatar" aria-hidden="true">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}"
+                                     alt="{{ user.get_full_name }}" class="avatar-img">
+                            {% else %}
+                                <i class="fa-solid fa-circle-user"></i>
+                            {% endif %}
+                        </span>
+                        <span class="user-name d-none d-lg-inline ms-1">
+                            {{ user.get_full_name|default:user.username }}
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom">
+                        <li>
+                            <div class="dropdown-header-custom">
+                                <span class="user-fullname">{{ user.get_full_name|default:user.username }}</span>
+                                <span class="role-badge">{{ user.get_role_display }}</span>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fa-solid fa-user me-2" aria-hidden="true"></i>Mi Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item dropdown-item-danger">
+                                    <i class="fa-solid fa-right-from-bracket me-2" aria-hidden="true"></i>Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+                {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'accounts:login' %}">
+                        <i class="fa-solid fa-right-to-bracket me-1" aria-hidden="true"></i>Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-nav-register" href="{% url 'accounts:register' %}">
+                        <i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i>Registrarse
+                    </a>
+                </li>
+
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
