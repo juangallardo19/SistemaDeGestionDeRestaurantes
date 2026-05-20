@@ -1,0 +1,38 @@
+<!-- Modal de confirmación reutilizable -->
+<!-- Uso: <button data-confirm-url="/ruta/" data-confirm-title="Título" data-confirm-message="Mensaje"> -->
+<div class="modal fade" id="confirmModal" tabindex="-1"
+     aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-confirm">
+        <div class="modal-content modal-content-custom">
+
+            <div class="modal-header modal-header-confirm">
+                <div class="modal-icon-wrapper" aria-hidden="true">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Cancelar"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="confirm-message mb-0" id="confirmModalMessage">
+                    ¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.
+                </p>
+            </div>
+
+            <div class="modal-footer modal-footer-confirm">
+                <button type="button" class="btn btn-cancel-custom" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark me-1" aria-hidden="true"></i>Cancelar
+                </button>
+                <form id="confirmForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger-custom">
+                        <i class="fa-solid fa-trash me-1" aria-hidden="true"></i>
+                        <span id="confirmBtnText">Eliminar</span>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

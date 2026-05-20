@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Error del servidor (500){% endblock %}
+
+{% block content %}
+<div class="error-page" role="main">
+    <div class="error-card">
+        <div class="error-illustration" aria-hidden="true">
+            <span class="error-code">500</span>
+            <i class="fa-solid fa-fire-burner error-icon"></i>
+        </div>
+        <h1 class="error-title">Algo se quemó en la cocina</h1>
+        <p class="error-description">
+            Hubo un error inesperado en el servidor. Nuestro equipo ya fue notificado
+            y estará resolviendo el problema. Por favor, intenta de nuevo en unos momentos.
+        </p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary-custom">
+                <i class="fa-solid fa-house me-2" aria-hidden="true"></i>Volver al inicio
+            </a>
+            <button onclick="window.location.reload()" class="btn btn-outline-custom">
+                <i class="fa-solid fa-rotate-right me-2" aria-hidden="true"></i>Reintentar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
