@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ titulo }} — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 640px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'menu:lista_categorias' %}">Categorías</a></li>
+      <li class="breadcrumb-item active">{{ titulo }}</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bi bi-tags me-2"></i>{{ titulo }}</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <!-- Preview de imagen -->
+        <div id="preview-container" class="mb-3 {% if not objeto or not objeto.imagen %}d-none{% endif %}">
+          <label class="form-label text-muted small">Vista previa</label>
+          <div>
+            <img id="imagen-preview"
+                 src="{% if objeto and objeto.imagen %}{{ objeto.imagen.url }}{% else %}{% endif %}"
+                 alt="Vista previa"
+                 class="img-fluid rounded border shadow-sm"
+                 style="max-height: 200px; object-fit: cover;">
+          </div>
+        </div>
+
+        <hr>
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'menu:lista_categorias' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i>
+            {% if objeto %}Guardar cambios{% else %}Crear categoría{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const imagenInput = document.getElementById('id_imagen');
+  if (imagenInput) {
+    imagenInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('imagen-preview').src = e.target.result;
+        document.getElementById('preview-container').classList.remove('d-none');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+{% endblock %}

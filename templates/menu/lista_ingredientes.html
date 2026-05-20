@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Ingredientes — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Ingredientes</h2>
+    {% if user.is_admin or user.is_mesero %}
+    <a href="{% url 'menu:crear_ingrediente' %}" class="btn btn-success">
+      <i class="bi bi-plus-circle me-1"></i>Nuevo ingrediente
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Unidad de medida</th>
+              <th class="text-end">Stock actual</th>
+              <th class="text-end">Stock mínimo</th>
+              <th class="text-center">Estado</th>
+              {% if user.is_admin or user.is_mesero %}
+              <th class="text-center">Acciones</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for ing in ingredientes %}
+            <tr {% if ing.stock_bajo %}class="table-danger"{% endif %}>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td class="fw-semibold">
+                {% if ing.stock_bajo %}
+                <i class="bi bi-exclamation-triangle-fill text-danger me-1"
+                   title="Stock por debajo del mínimo"></i>
+                {% endif %}
+                {{ ing.nombre }}
+              </td>
+              <td class="text-muted">{{ ing.unidad_medida }}</td>
+              <td class="text-end {% if ing.stock_bajo %}text-danger fw-bold{% endif %}">
+                {{ ing.stock_actual }}
+              </td>
+              <td class="text-end text-muted">{{ ing.stock_minimo }}</td>
+              <td class="text-center">
+                {% if ing.activo %}
+                <span class="badge bg-success">Activo</span>
+                {% else %}
+                <span class="badge bg-secondary">Inactivo</span>
+                {% endif %}
+              </td>
+              {% if user.is_admin or user.is_mesero %}
+              <td class="text-center">
+                <div class="d-flex gap-1 justify-content-center">
+                  <a href="{% url 'menu:editar_ingrediente' ing.pk %}"
+                     class="btn btn-outline-warning btn-sm" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  {% if ing.activo %}
+                  <form method="POST" action="{% url 'menu:eliminar_ingrediente' ing.pk %}"
+                        onsubmit="return confirm('¿Desactivar el ingrediente «{{ ing.nombre }}»?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Desactivar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-5">
+                <i class="bi bi-box-seam display-4 d-block mb-2"></i>
+                No hay ingredientes registrados.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-muted small mt-2">
+    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+    Las filas en rojo tienen stock actual igual o inferior al mínimo.
+  </p>
+
+</div>
+{% endblock %}
