@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de reserva — RestaurApp</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background-color:#f4f4f4;padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               style="background-color:#ffffff;border-radius:8px;overflow:hidden;
+                      box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background-color:#1a1a2e;padding:28px 30px;text-align:center;">
+              <p style="margin:0;font-size:26px;font-weight:bold;color:#ffffff;
+                        letter-spacing:2px;">&#127869; RestaurApp</p>
+              <p style="margin:6px 0 0;font-size:13px;color:#aaaaaa;">
+                Sistema de Gestión de Restaurante
+              </p>
+            </td>
+          </tr>
+
+          <!-- TÍTULO -->
+          <tr>
+            <td style="background-color:#e3f2fd;padding:20px 30px;text-align:center;
+                       border-bottom:3px solid #1976d2;">
+              <p style="margin:0;font-size:20px;font-weight:bold;color:#0d47a1;">
+                &#128197; Reserva confirmada
+              </p>
+            </td>
+          </tr>
+
+          <!-- CUERPO -->
+          <tr>
+            <td style="padding:30px;">
+
+              <p style="margin:0 0 24px;color:#444444;font-size:15px;">
+                Hola, <strong>{{ cliente.get_full_name|default:cliente.username }}</strong>.
+                Tu reserva ha sido registrada. A continuación encontrarás los detalles:
+              </p>
+
+              <!-- Detalles de la reserva -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="border-collapse:collapse;border-radius:6px;
+                            overflow:hidden;border:1px solid #e0e0e0;">
+                <tr style="background-color:#1a1a2e;">
+                  <th colspan="2"
+                      style="padding:12px 16px;text-align:left;color:#ffffff;font-size:14px;">
+                    Datos de la reserva
+                  </th>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;color:#666666;font-size:14px;
+                             border-bottom:1px solid #eeeeee;width:45%;">
+                    Fecha
+                  </td>
+                  <td style="padding:12px 16px;color:#333333;font-weight:bold;
+                             font-size:14px;border-bottom:1px solid #eeeeee;">
+                    {{ reserva.fecha|date:"l, d \d\e F \d\e Y" }}
+                  </td>
+                </tr>
+                <tr style="background-color:#f8f9fa;">
+                  <td style="padding:12px 16px;color:#666666;font-size:14px;
+                             border-bottom:1px solid #eeeeee;">
+                    Hora
+                  </td>
+                  <td style="padding:12px 16px;color:#333333;font-weight:bold;
+                             font-size:14px;border-bottom:1px solid #eeeeee;">
+                    {{ reserva.hora_inicio }} — {{ reserva.hora_fin }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;color:#666666;font-size:14px;
+                             border-bottom:1px solid #eeeeee;">
+                    Mesa
+                  </td>
+                  <td style="padding:12px 16px;color:#333333;font-weight:bold;
+                             font-size:14px;border-bottom:1px solid #eeeeee;">
+                    Mesa {{ mesa.numero }}
+                    <span style="font-weight:normal;color:#777777;">
+                      ({{ mesa.get_ubicacion_display }} — cap. {{ mesa.capacidad }} personas)
+                    </span>
+                  </td>
+                </tr>
+                <tr style="background-color:#f8f9fa;">
+                  <td style="padding:12px 16px;color:#666666;font-size:14px;
+                             border-bottom:1px solid #eeeeee;">
+                    Número de personas
+                  </td>
+                  <td style="padding:12px 16px;color:#333333;font-weight:bold;
+                             font-size:14px;border-bottom:1px solid #eeeeee;">
+                    {{ reserva.numero_personas }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;color:#666666;font-size:14px;">
+                    Estado
+                  </td>
+                  <td style="padding:12px 16px;font-weight:bold;font-size:14px;">
+                    {% if reserva.estado == 'confirmada' %}
+                    <span style="color:#28a745;">{{ reserva.get_estado_display }}</span>
+                    {% elif reserva.estado == 'pendiente' %}
+                    <span style="color:#ffc107;">{{ reserva.get_estado_display }}</span>
+                    {% else %}
+                    <span style="color:#333333;">{{ reserva.get_estado_display }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+
+              {% if reserva.notas %}
+              <div style="margin-top:20px;padding:14px 16px;background-color:#fff8e1;
+                          border-left:4px solid #ffc107;border-radius:4px;">
+                <p style="margin:0;color:#7a5c00;font-size:14px;">
+                  <strong>Notas:</strong> {{ reserva.notas }}
+                </p>
+              </div>
+              {% endif %}
+
+              <div style="margin-top:24px;padding:16px;background-color:#e8f5e9;
+                          border-radius:6px;border:1px solid #c8e6c9;">
+                <p style="margin:0;color:#2e7d32;font-size:14px;">
+                  &#9432; Si necesitas modificar o cancelar tu reserva, comunícate con nosotros
+                  con al menos 2 horas de anticipación.
+                </p>
+              </div>
+
+              <p style="margin:24px 0 0;color:#777777;font-size:13px;">
+                ¡Te esperamos! Gracias por reservar en RestaurApp.
+              </p>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background-color:#f8f9fa;padding:18px 30px;
+                       text-align:center;border-top:1px solid #e0e0e0;">
+              <p style="margin:0;color:#999999;font-size:12px;">
+                Este correo fue generado automáticamente por RestaurApp.<br>
+                Por favor no respondas este mensaje.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

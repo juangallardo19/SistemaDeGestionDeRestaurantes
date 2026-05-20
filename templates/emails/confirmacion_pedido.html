@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de pedido — RestaurApp</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background-color:#f4f4f4;padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               style="background-color:#ffffff;border-radius:8px;overflow:hidden;
+                      box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background-color:#1a1a2e;padding:28px 30px;text-align:center;">
+              <p style="margin:0;font-size:26px;font-weight:bold;color:#ffffff;
+                        letter-spacing:2px;">&#127869; RestaurApp</p>
+              <p style="margin:6px 0 0;font-size:13px;color:#aaaaaa;">
+                Sistema de Gestión de Restaurante
+              </p>
+            </td>
+          </tr>
+
+          <!-- TÍTULO -->
+          <tr>
+            <td style="background-color:#e8f5e9;padding:20px 30px;text-align:center;
+                       border-bottom:3px solid #28a745;">
+              <p style="margin:0;font-size:20px;font-weight:bold;color:#1b5e20;">
+                &#10003; ¡Pedido recibido con éxito!
+              </p>
+            </td>
+          </tr>
+
+          <!-- CUERPO -->
+          <tr>
+            <td style="padding:30px;">
+
+              <p style="margin:0 0 20px;color:#444444;font-size:15px;">
+                Hola, <strong>{{ cliente.get_full_name|default:cliente.username }}</strong>.
+                Te confirmamos que tu pedido ha sido registrado correctamente.
+              </p>
+
+              <!-- Info del pedido -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background-color:#f8f9fa;border-radius:6px;
+                            margin-bottom:24px;border:1px solid #e0e0e0;">
+                <tr>
+                  <td style="padding:14px 16px;color:#666666;font-size:13px;
+                             border-bottom:1px solid #e0e0e0;">
+                    NÚMERO DE PEDIDO
+                  </td>
+                  <td style="padding:14px 16px;text-align:right;font-weight:bold;
+                             font-size:18px;color:#1a1a2e;border-bottom:1px solid #e0e0e0;">
+                    #{{ pedido.pk }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:14px 16px;color:#666666;font-size:13px;
+                             border-bottom:1px solid #e0e0e0;">
+                    ESTADO
+                  </td>
+                  <td style="padding:14px 16px;text-align:right;font-weight:bold;
+                             color:#28a745;border-bottom:1px solid #e0e0e0;">
+                    {{ pedido.get_estado_display }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:14px 16px;color:#666666;font-size:13px;">
+                    MÉTODO DE PAGO
+                  </td>
+                  <td style="padding:14px 16px;text-align:right;color:#333333;">
+                    {{ pedido.get_metodo_pago_display }}
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Detalle de items -->
+              <p style="margin:0 0 10px;font-size:15px;font-weight:bold;color:#333333;">
+                Detalle del pedido
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="border-collapse:collapse;">
+                <thead>
+                  <tr style="background-color:#1a1a2e;">
+                    <th style="padding:10px 12px;text-align:left;color:#ffffff;
+                               font-size:13px;font-weight:600;">Plato</th>
+                    <th style="padding:10px 12px;text-align:center;color:#ffffff;
+                               font-size:13px;font-weight:600;">Cant.</th>
+                    <th style="padding:10px 12px;text-align:right;color:#ffffff;
+                               font-size:13px;font-weight:600;">P. unit.</th>
+                    <th style="padding:10px 12px;text-align:right;color:#ffffff;
+                               font-size:13px;font-weight:600;">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for detalle in detalles %}
+                  <tr style="border-bottom:1px solid #eeeeee;">
+                    <td style="padding:10px 12px;color:#333333;font-size:14px;">
+                      {{ detalle.plato.nombre }}
+                    </td>
+                    <td style="padding:10px 12px;text-align:center;color:#555555;font-size:14px;">
+                      {{ detalle.cantidad }}
+                    </td>
+                    <td style="padding:10px 12px;text-align:right;color:#555555;font-size:14px;">
+                      ${{ detalle.precio_unitario }}
+                    </td>
+                    <td style="padding:10px 12px;text-align:right;font-weight:bold;
+                               color:#333333;font-size:14px;">
+                      ${{ detalle.subtotal }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr style="background-color:#f8f9fa;">
+                    <td colspan="3"
+                        style="padding:12px 12px;text-align:right;font-weight:bold;
+                               font-size:15px;color:#333333;">
+                      Total
+                    </td>
+                    <td style="padding:12px 12px;text-align:right;font-weight:bold;
+                               font-size:16px;color:#1a1a2e;">
+                      ${{ pedido.total }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              {% if pedido.notas %}
+              <div style="margin-top:20px;padding:14px 16px;background-color:#fff8e1;
+                          border-left:4px solid #ffc107;border-radius:4px;">
+                <p style="margin:0;color:#7a5c00;font-size:14px;">
+                  <strong>Notas:</strong> {{ pedido.notas }}
+                </p>
+              </div>
+              {% endif %}
+
+              <p style="margin:28px 0 0;color:#777777;font-size:13px;">
+                Nos pondremos en contacto contigo si hay alguna novedad con tu pedido.
+                ¡Gracias por elegirnos!
+              </p>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background-color:#f8f9fa;padding:18px 30px;
+                       text-align:center;border-top:1px solid #e0e0e0;">
+              <p style="margin:0;color:#999999;font-size:12px;">
+                Este correo fue generado automáticamente por RestaurApp.<br>
+                Por favor no respondas este mensaje.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
