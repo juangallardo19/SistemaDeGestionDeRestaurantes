@@ -78,6 +78,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="{% url 'inventory:crear_ingrediente' %}">
+                                <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Nuevo ingrediente
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="{% url 'inventory:recetas' %}">
                                 <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Recetas
                             </a>
@@ -106,7 +111,7 @@
             </ul>
 
             <!-- Acciones de la derecha -->
-            <div class="d-flex align-items-center gap-2 ms-auto">
+            <div class="d-flex align-items-center gap-2 ms-lg-auto mt-3 mt-lg-0 pt-3 pt-lg-0 border-top border-top-lg-0">
 
                 <button class="btn-theme-toggle" id="themeToggle"
                         title="Cambiar tema" aria-label="Cambiar tema claro/oscuro">
@@ -132,7 +137,7 @@
                             {{ user.get_full_name|default:user.username }}
                         </span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom">
+                    <ul class="dropdown-menu dropdown-menu-lg-end dropdown-menu-custom">
                         <li>
                             <div class="dropdown-header-custom">
                                 <span class="user-fullname">{{ user.get_full_name|default:user.username }}</span>

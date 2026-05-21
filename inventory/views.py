@@ -10,7 +10,7 @@ from accounts.decorators import admin_required, mesero_required
 from accounts.email_utils import send_alerta_stock_bajo
 from menu.models import Ingrediente, Plato, PlatoIngrediente
 
-from .forms import MovimientoInventarioForm, PlatoIngredienteForm
+from .forms import IngredienteForm, MovimientoInventarioForm, PlatoIngredienteForm
 from .models import MovimientoInventario
 
 logger = logging.getLogger(__name__)
@@ -186,6 +186,19 @@ def editar_receta(request, plato_pk):
         'ingredientes_plato': ingredientes_plato,
         'form': form,
     })
+
+
+@admin_required
+def crear_ingrediente(request):
+    form = IngredienteForm(request.POST or None)
+    if form.is_valid():
+        ingrediente = form.save()
+        messages.success(
+            request,
+            f'Ingrediente "{ingrediente.nombre}" creado correctamente.',
+        )
+        return redirect('inventory:list')
+    return render(request, 'inventory/crear_ingrediente.html', {'form': form})
 
 
 @admin_required
