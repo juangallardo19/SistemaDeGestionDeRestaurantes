@@ -22,11 +22,6 @@ class CustomUserCreationForm(UserCreationForm):
         label='Apellido',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
     )
-    role = forms.ChoiceField(
-        choices=CustomUser.ROLE_CHOICES,
-        label='Rol',
-        widget=forms.Select(attrs={'class': 'form-select'}),
-    )
     phone = forms.CharField(
         max_length=20,
         required=False,
@@ -36,7 +31,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'phone', 'password1', 'password2')
+        fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
