@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RestaurApp — Sistema de Gestión de Restaurante. Administrá pedidos, reservas, menú e inventario desde un solo lugar.">
     <title>{% block title %}RestaurApp{% endblock %}</title>
 
     <!-- Anti-FOUC: aplica el tema guardado antes de que Bootstrap renderice -->
@@ -31,11 +32,13 @@
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
 {% include 'partials/navbar.html' %}
 
 {% include 'partials/messages.html' %}
 
-<main class="page-content">
+<main class="page-content" id="main-content">
     <div class="container-fluid py-4">
         {% block content %}{% endblock %}
     </div>
@@ -44,7 +47,7 @@
 <footer class="site-footer">
     <div class="container text-center">
         <span class="footer-brand">
-            <i class="fa-solid fa-utensils me-2"></i>RestaurApp
+            <i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>RestaurApp
         </span>
         <p class="footer-copy mt-1 mb-0">
             &copy; {% now "Y" %} RestaurApp &mdash; Sistema de Gestión de Restaurante

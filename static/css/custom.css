@@ -973,3 +973,111 @@ main.page-content {
         font-size: .8rem;
     }
 }
+
+/* ---------------------------------------------------------
+   18. Accesibilidad — focus visible
+   --------------------------------------------------------- */
+:focus-visible {
+    outline:        2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius:  var(--radius-sm);
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ---------------------------------------------------------
+   19. Screen-reader only + skip link
+   --------------------------------------------------------- */
+.sr-only {
+    position:    absolute;
+    width:       1px;
+    height:      1px;
+    padding:     0;
+    margin:      -1px;
+    overflow:    hidden;
+    clip:        rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border:      0;
+}
+
+.skip-link {
+    position:        absolute;
+    top:             -100%;
+    left:            1rem;
+    padding:         0.6rem 1.2rem;
+    background:      var(--color-primary);
+    color:           #fff;
+    font-weight:     600;
+    font-size:       0.875rem;
+    border-radius:   0 0 var(--radius-sm) var(--radius-sm);
+    text-decoration: none;
+    z-index:         9999;
+    transition:      top var(--duration-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* ---------------------------------------------------------
+   20. Transición suave al cambiar tema
+   --------------------------------------------------------- */
+body,
+.site-navbar,
+.site-footer,
+.card,
+.dropdown-menu,
+.form-control,
+.form-select,
+.table {
+    transition: background-color 0.2s ease,
+                color            0.2s ease,
+                border-color     0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body,
+    .site-navbar,
+    .site-footer,
+    .card,
+    .dropdown-menu,
+    .form-control,
+    .form-select,
+    .table {
+        transition: none;
+    }
+}
+
+/* ---------------------------------------------------------
+   21. Mobile 390px — ajustes finales
+   --------------------------------------------------------- */
+@media (max-width: 390px) {
+    /* KPI cards: 1 columna */
+    .kpi-card,
+    .row.g-3 > [class*="col-"],
+    .row.g-4 > [class*="col-"] {
+        flex:      0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Tablas: scroll horizontal obligatorio */
+    .table-responsive {
+        overflow-x:                 auto;
+        -webkit-overflow-scrolling: touch;
+        display:                    block;
+        width:                      100%;
+    }
+
+    /* Botones de exportación: apilados verticalmente */
+    .btn-export,
+    .btn-export-sm {
+        width:           100% !important;
+        justify-content: center !important;
+    }
+
+    .d-flex.flex-wrap.gap-2:not(.align-items-center) {
+        flex-direction: column !important;
+    }
+}
