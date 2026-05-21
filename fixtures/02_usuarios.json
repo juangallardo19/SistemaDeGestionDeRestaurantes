@@ -1,0 +1,128 @@
+[
+  {
+    "model": "accounts.customuser",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin1",
+      "first_name": "Admin",
+      "last_name": "General",
+      "email": "admin@restaurante.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-01-01T08:00:00Z",
+      "role": "admin",
+      "phone": "3001234567",
+      "profile_picture": null,
+      "groups": [3],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": "2026-05-19T10:30:00Z",
+      "is_superuser": false,
+      "username": "mesero1",
+      "first_name": "Carlos",
+      "last_name": "Ramírez",
+      "email": "carlos.ramirez@restaurante.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-15T09:00:00Z",
+      "role": "mesero",
+      "phone": "3109876543",
+      "profile_picture": null,
+      "groups": [2],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": "2026-05-18T14:15:00Z",
+      "is_superuser": false,
+      "username": "mesero2",
+      "first_name": "Ana",
+      "last_name": "Gómez",
+      "email": "ana.gomez@restaurante.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-02-01T09:00:00Z",
+      "role": "mesero",
+      "phone": "3204561234",
+      "profile_picture": null,
+      "groups": [2],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": "2026-05-20T11:00:00Z",
+      "is_superuser": false,
+      "username": "cliente1",
+      "first_name": "Juan",
+      "last_name": "Pérez",
+      "email": "juan.perez@demo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-02-10T17:30:00Z",
+      "role": "cliente",
+      "phone": "3157892345",
+      "profile_picture": null,
+      "groups": [1],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": "2026-05-17T19:45:00Z",
+      "is_superuser": false,
+      "username": "cliente2",
+      "first_name": "María",
+      "last_name": "López",
+      "email": "maria.lopez@demo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-02-20T12:00:00Z",
+      "role": "cliente",
+      "phone": "3143216789",
+      "profile_picture": null,
+      "groups": [1],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$xwf4GesSkQ6jj9+6$+RSOh6DXOZ+x+4F3ZD7egb9ozzpE/YUaM9PQN+/D3+E=",
+      "last_login": "2026-05-14T20:10:00Z",
+      "is_superuser": false,
+      "username": "cliente3",
+      "first_name": "Luis",
+      "last_name": "Torres",
+      "email": "luis.torres@demo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-03-05T16:00:00Z",
+      "role": "cliente",
+      "phone": "3008763412",
+      "profile_picture": null,
+      "groups": [1],
+      "user_permissions": []
+    }
+  }
+]

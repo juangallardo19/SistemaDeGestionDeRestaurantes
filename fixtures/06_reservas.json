@@ -1,0 +1,152 @@
+[
+  {
+    "model": "reservations.reserva",
+    "pk": 1,
+    "fields": {
+      "cliente": 4,
+      "mesa": 2,
+      "fecha": "2026-03-22",
+      "hora_inicio": "19:00:00",
+      "hora_fin": "21:00:00",
+      "numero_personas": 4,
+      "estado": "completada",
+      "notas": "",
+      "fecha_creacion": "2026-03-20T15:30:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 2,
+    "fields": {
+      "cliente": 5,
+      "mesa": 5,
+      "fecha": "2026-04-05",
+      "hora_inicio": "13:00:00",
+      "hora_fin": "15:00:00",
+      "numero_personas": 3,
+      "estado": "completada",
+      "notas": "Preferiblemente mesa alejada del ingreso",
+      "fecha_creacion": "2026-04-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 3,
+    "fields": {
+      "cliente": 6,
+      "mesa": 4,
+      "fecha": "2026-04-18",
+      "hora_inicio": "20:00:00",
+      "hora_fin": "22:00:00",
+      "numero_personas": 6,
+      "estado": "completada",
+      "notas": "Reunión familiar, decoración especial",
+      "fecha_creacion": "2026-04-14T18:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 4,
+    "fields": {
+      "cliente": 4,
+      "mesa": 1,
+      "fecha": "2026-05-10",
+      "hora_inicio": "14:00:00",
+      "hora_fin": "16:00:00",
+      "numero_personas": 2,
+      "estado": "completada",
+      "notas": "",
+      "fecha_creacion": "2026-05-08T09:15:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 5,
+    "fields": {
+      "cliente": 5,
+      "mesa": 3,
+      "fecha": "2026-05-22",
+      "hora_inicio": "19:30:00",
+      "hora_fin": "21:30:00",
+      "numero_personas": 4,
+      "estado": "confirmada",
+      "notas": "",
+      "fecha_creacion": "2026-05-19T11:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 6,
+    "fields": {
+      "cliente": 6,
+      "mesa": 7,
+      "fecha": "2026-05-25",
+      "hora_inicio": "12:00:00",
+      "hora_fin": "14:00:00",
+      "numero_personas": 2,
+      "estado": "confirmada",
+      "notas": "Almuerzo de negocios",
+      "fecha_creacion": "2026-05-20T08:30:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 7,
+    "fields": {
+      "cliente": 4,
+      "mesa": 6,
+      "fecha": "2026-05-28",
+      "hora_inicio": "20:00:00",
+      "hora_fin": "22:30:00",
+      "numero_personas": 8,
+      "estado": "confirmada",
+      "notas": "Cumpleaños, solicitar torta y decoración",
+      "fecha_creacion": "2026-05-20T10:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 8,
+    "fields": {
+      "cliente": 5,
+      "mesa": 8,
+      "fecha": "2026-05-30",
+      "hora_inicio": "19:00:00",
+      "hora_fin": "21:00:00",
+      "numero_personas": 4,
+      "estado": "pendiente",
+      "notas": "",
+      "fecha_creacion": "2026-05-20T14:20:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 9,
+    "fields": {
+      "cliente": 6,
+      "mesa": 2,
+      "fecha": "2026-06-02",
+      "hora_inicio": "13:00:00",
+      "hora_fin": "15:00:00",
+      "numero_personas": 3,
+      "estado": "pendiente",
+      "notas": "Un integrante es vegetariano",
+      "fecha_creacion": "2026-05-20T16:45:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 10,
+    "fields": {
+      "cliente": 4,
+      "mesa": 4,
+      "fecha": "2026-04-25",
+      "hora_inicio": "18:00:00",
+      "hora_fin": "20:00:00",
+      "numero_personas": 5,
+      "estado": "cancelada",
+      "notas": "Cliente canceló por enfermedad",
+      "fecha_creacion": "2026-04-22T17:00:00Z"
+    }
+  }
+]

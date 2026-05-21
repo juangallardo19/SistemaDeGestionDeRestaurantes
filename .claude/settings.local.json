@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Test-Path *)"
+      "Bash(Test-Path *)",
+      "Bash(Get-ChildItem -Recurse -Name \"*.py\")",
+      "Bash(Select-Object -First 60)",
+      "Bash(xargs ls -la)",
+      "Bash(python3 *)"
     ]
   }
 }

@@ -1,0 +1,421 @@
+[
+  {
+    "model": "menu.categoria",
+    "pk": 1,
+    "fields": {
+      "nombre": "Entradas",
+      "descripcion": "Aperitivos y entradas para comenzar la experiencia con el mejor sabor.",
+      "imagen": null,
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.categoria",
+    "pk": 2,
+    "fields": {
+      "nombre": "Platos Fuertes",
+      "descripcion": "Nuestros platos principales elaborados con ingredientes frescos y recetas tradicionales.",
+      "imagen": null,
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.categoria",
+    "pk": 3,
+    "fields": {
+      "nombre": "Postres",
+      "descripcion": "Delicias dulces para cerrar su experiencia gastronómica de manera perfecta.",
+      "imagen": null,
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.categoria",
+    "pk": 4,
+    "fields": {
+      "nombre": "Bebidas",
+      "descripcion": "Refrescantes bebidas naturales y artesanales para acompañar su comida.",
+      "imagen": null,
+      "activo": true
+    }
+  },
+
+  {
+    "model": "menu.ingrediente",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pollo",
+      "unidad_medida": "g",
+      "stock_actual": "5000.00",
+      "stock_minimo": "2000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 2,
+    "fields": {
+      "nombre": "Res",
+      "unidad_medida": "g",
+      "stock_actual": "4500.00",
+      "stock_minimo": "1500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 3,
+    "fields": {
+      "nombre": "Cerdo",
+      "unidad_medida": "g",
+      "stock_actual": "3000.00",
+      "stock_minimo": "1000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 4,
+    "fields": {
+      "nombre": "Arroz",
+      "unidad_medida": "g",
+      "stock_actual": "8000.00",
+      "stock_minimo": "2000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 5,
+    "fields": {
+      "nombre": "Papa",
+      "unidad_medida": "g",
+      "stock_actual": "6000.00",
+      "stock_minimo": "2000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 6,
+    "fields": {
+      "nombre": "Tomate",
+      "unidad_medida": "g",
+      "stock_actual": "3000.00",
+      "stock_minimo": "800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 7,
+    "fields": {
+      "nombre": "Cebolla",
+      "unidad_medida": "g",
+      "stock_actual": "2500.00",
+      "stock_minimo": "600.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "menu.ingrediente",
+    "pk": 8,
+    "fields": {
+      "nombre": "Queso",
+      "unidad_medida": "g",
+      "stock_actual": "1200.00",
+      "stock_minimo": "500.00",
+      "activo": true
+    }
+  },
+
+  {
+    "model": "menu.plato",
+    "pk": 1,
+    "fields": {
+      "nombre": "Empanadas de Pipián",
+      "descripcion": "Crujientes empanadas rellenas de cerdo desmechado en salsa de pipián, acompañadas de hogao casero.",
+      "precio": "12000.00",
+      "categoria": 1,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 15,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 2,
+    "fields": {
+      "nombre": "Ceviche de Camarón",
+      "descripcion": "Camarones frescos marinados en limón con tomate, cebolla morada, cilantro y ají al gusto.",
+      "precio": "18000.00",
+      "categoria": 1,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 10,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 3,
+    "fields": {
+      "nombre": "Patacones con Hogao",
+      "descripcion": "Tostones de plátano verde crujientes servidos con hogao de tomate y cebolla, cuajada y guacamole.",
+      "precio": "9500.00",
+      "categoria": 1,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 15,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 4,
+    "fields": {
+      "nombre": "Bandeja Paisa",
+      "descripcion": "Plato insignia con frijoles, arroz, carne molida, chicharrón, chorizo, aguacate, arepa y huevo frito.",
+      "precio": "35000.00",
+      "categoria": 2,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 30,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 5,
+    "fields": {
+      "nombre": "Ajiaco Santafereño",
+      "descripcion": "Tradicional sopa bogotana de tres tipos de papa con pollo desmechado, guascas y crema de leche.",
+      "precio": "28000.00",
+      "categoria": 2,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 35,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 6,
+    "fields": {
+      "nombre": "Lomo Saltado",
+      "descripcion": "Tiernas tiras de res salteadas con tomate, cebolla y pimientos en salsa de soya, servidas con papas fritas y arroz.",
+      "precio": "32000.00",
+      "categoria": 2,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 25,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 7,
+    "fields": {
+      "nombre": "Churrasco con Chimichurri",
+      "descripcion": "Corte de res madurado a la parrilla, término a elección, acompañado de salsa chimichurri y papas rústicas.",
+      "precio": "45000.00",
+      "categoria": 2,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 30,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 8,
+    "fields": {
+      "nombre": "Arroz con Pollo a la Criolla",
+      "descripcion": "Jugoso pollo guisado con arroz cremoso en salsa criolla de tomate, cebolla y pimentón.",
+      "precio": "22000.00",
+      "categoria": 2,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 25,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 9,
+    "fields": {
+      "nombre": "Tres Leches",
+      "descripcion": "Esponjoso bizcocho bañado en mezcla de tres leches, coronado con crema chantilly y canela.",
+      "precio": "12000.00",
+      "categoria": 3,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 10,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 10,
+    "fields": {
+      "nombre": "Flan de Caramelo",
+      "descripcion": "Clásico flan cremoso bañado en caramelo oscuro, servido frío con salsa de frutos rojos.",
+      "precio": "10000.00",
+      "categoria": 3,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 10,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 11,
+    "fields": {
+      "nombre": "Limonada de Coco",
+      "descripcion": "Refrescante limonada natural mezclada con crema de coco y hielo frappé.",
+      "precio": "8000.00",
+      "categoria": 4,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 5,
+      "ingredientes": []
+    }
+  },
+  {
+    "model": "menu.plato",
+    "pk": 12,
+    "fields": {
+      "nombre": "Agua de Panela con Limón",
+      "descripcion": "Bebida tradicional colombiana de panela derretida con jugo de limón, servida fría o caliente.",
+      "precio": "9000.00",
+      "categoria": 4,
+      "imagen": null,
+      "disponible": true,
+      "tiempo_preparacion": 5,
+      "ingredientes": []
+    }
+  },
+
+  {
+    "model": "menu.platoingrediente",
+    "pk": 1,
+    "fields": {"plato": 1, "ingrediente": 3, "cantidad_necesaria": "100.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 2,
+    "fields": {"plato": 1, "ingrediente": 7, "cantidad_necesaria": "50.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 3,
+    "fields": {"plato": 1, "ingrediente": 6, "cantidad_necesaria": "80.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 4,
+    "fields": {"plato": 2, "ingrediente": 6, "cantidad_necesaria": "100.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 5,
+    "fields": {"plato": 2, "ingrediente": 7, "cantidad_necesaria": "80.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 6,
+    "fields": {"plato": 3, "ingrediente": 5, "cantidad_necesaria": "200.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 7,
+    "fields": {"plato": 3, "ingrediente": 6, "cantidad_necesaria": "100.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 8,
+    "fields": {"plato": 3, "ingrediente": 7, "cantidad_necesaria": "80.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 9,
+    "fields": {"plato": 4, "ingrediente": 3, "cantidad_necesaria": "150.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 10,
+    "fields": {"plato": 4, "ingrediente": 4, "cantidad_necesaria": "180.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 11,
+    "fields": {"plato": 4, "ingrediente": 5, "cantidad_necesaria": "150.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 12,
+    "fields": {"plato": 5, "ingrediente": 1, "cantidad_necesaria": "200.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 13,
+    "fields": {"plato": 5, "ingrediente": 5, "cantidad_necesaria": "300.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 14,
+    "fields": {"plato": 5, "ingrediente": 4, "cantidad_necesaria": "120.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 15,
+    "fields": {"plato": 6, "ingrediente": 2, "cantidad_necesaria": "250.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 16,
+    "fields": {"plato": 6, "ingrediente": 6, "cantidad_necesaria": "100.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 17,
+    "fields": {"plato": 6, "ingrediente": 7, "cantidad_necesaria": "80.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 18,
+    "fields": {"plato": 7, "ingrediente": 2, "cantidad_necesaria": "350.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 19,
+    "fields": {"plato": 7, "ingrediente": 6, "cantidad_necesaria": "80.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 20,
+    "fields": {"plato": 8, "ingrediente": 1, "cantidad_necesaria": "200.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 21,
+    "fields": {"plato": 8, "ingrediente": 4, "cantidad_necesaria": "200.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 22,
+    "fields": {"plato": 8, "ingrediente": 6, "cantidad_necesaria": "100.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 23,
+    "fields": {"plato": 9, "ingrediente": 8, "cantidad_necesaria": "60.00"}
+  },
+  {
+    "model": "menu.platoingrediente",
+    "pk": 24,
+    "fields": {"plato": 10, "ingrediente": 8, "cantidad_necesaria": "50.00"}
+  }
+]

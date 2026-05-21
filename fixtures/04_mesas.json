@@ -1,0 +1,82 @@
+[
+  {
+    "model": "reservations.mesa",
+    "pk": 1,
+    "fields": {
+      "numero": 1,
+      "capacidad": 2,
+      "ubicacion": "interior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 2,
+    "fields": {
+      "numero": 2,
+      "capacidad": 4,
+      "ubicacion": "interior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 3,
+    "fields": {
+      "numero": 3,
+      "capacidad": 4,
+      "ubicacion": "exterior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 4,
+    "fields": {
+      "numero": 4,
+      "capacidad": 6,
+      "ubicacion": "interior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 5,
+    "fields": {
+      "numero": 5,
+      "capacidad": 6,
+      "ubicacion": "terraza",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 6,
+    "fields": {
+      "numero": 6,
+      "capacidad": 8,
+      "ubicacion": "interior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 7,
+    "fields": {
+      "numero": 7,
+      "capacidad": 2,
+      "ubicacion": "exterior",
+      "activa": true
+    }
+  },
+  {
+    "model": "reservations.mesa",
+    "pk": 8,
+    "fields": {
+      "numero": 8,
+      "capacidad": 4,
+      "ubicacion": "terraza",
+      "activa": true
+    }
+  }
+]

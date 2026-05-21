@@ -1,0 +1,378 @@
+[
+  {
+    "model": "orders.pedido",
+    "pk": 1,
+    "fields": {
+      "cliente": 4,
+      "mesero": 2,
+      "mesa": 3,
+      "estado": "entregado",
+      "fecha_creacion": "2026-02-25T12:30:00Z",
+      "fecha_actualizacion": "2026-02-25T13:15:00Z",
+      "total": "46000.00",
+      "metodo_pago": "efectivo",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 2,
+    "fields": {
+      "cliente": 5,
+      "mesero": 2,
+      "mesa": 1,
+      "estado": "entregado",
+      "fecha_creacion": "2026-03-02T20:00:00Z",
+      "fecha_actualizacion": "2026-03-02T20:45:00Z",
+      "total": "30000.00",
+      "metodo_pago": "tarjeta",
+      "notas": "Sin picante por favor"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 3,
+    "fields": {
+      "cliente": 6,
+      "mesero": 3,
+      "mesa": 5,
+      "estado": "entregado",
+      "fecha_creacion": "2026-03-08T13:20:00Z",
+      "fecha_actualizacion": "2026-03-08T14:10:00Z",
+      "total": "29000.00",
+      "metodo_pago": "simulado",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 4,
+    "fields": {
+      "cliente": 4,
+      "mesero": 3,
+      "mesa": 4,
+      "estado": "entregado",
+      "fecha_creacion": "2026-03-15T19:45:00Z",
+      "fecha_actualizacion": "2026-03-15T20:40:00Z",
+      "total": "43000.00",
+      "metodo_pago": "efectivo",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 5,
+    "fields": {
+      "cliente": 5,
+      "mesero": 2,
+      "mesa": 2,
+      "estado": "entregado",
+      "fecha_creacion": "2026-03-20T21:00:00Z",
+      "fecha_actualizacion": "2026-03-20T22:00:00Z",
+      "total": "80000.00",
+      "metodo_pago": "tarjeta",
+      "notas": "Mesa para dos, celebración de aniversario"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 6,
+    "fields": {
+      "cliente": 6,
+      "mesero": 3,
+      "mesa": 6,
+      "estado": "entregado",
+      "fecha_creacion": "2026-03-28T14:00:00Z",
+      "fecha_actualizacion": "2026-03-28T15:10:00Z",
+      "total": "73000.00",
+      "metodo_pago": "efectivo",
+      "notas": "El churrasco término ¾"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 7,
+    "fields": {
+      "cliente": 4,
+      "mesero": 2,
+      "mesa": 3,
+      "estado": "entregado",
+      "fecha_creacion": "2026-04-05T13:00:00Z",
+      "fecha_actualizacion": "2026-04-05T13:55:00Z",
+      "total": "46000.00",
+      "metodo_pago": "tarjeta",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 8,
+    "fields": {
+      "cliente": 5,
+      "mesero": 3,
+      "mesa": 7,
+      "estado": "cancelado",
+      "fecha_creacion": "2026-04-10T20:30:00Z",
+      "fecha_actualizacion": "2026-04-10T20:35:00Z",
+      "total": "18000.00",
+      "metodo_pago": "efectivo",
+      "notas": "Cliente canceló por demora"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 9,
+    "fields": {
+      "cliente": 6,
+      "mesero": 2,
+      "mesa": 2,
+      "estado": "entregado",
+      "fecha_creacion": "2026-04-15T19:15:00Z",
+      "fecha_actualizacion": "2026-04-15T20:20:00Z",
+      "total": "47000.00",
+      "metodo_pago": "simulado",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 10,
+    "fields": {
+      "cliente": 4,
+      "mesero": 3,
+      "mesa": 5,
+      "estado": "entregado",
+      "fecha_creacion": "2026-04-22T13:30:00Z",
+      "fecha_actualizacion": "2026-04-22T14:25:00Z",
+      "total": "51000.00",
+      "metodo_pago": "tarjeta",
+      "notas": "Sin cebolla en los patacones"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 11,
+    "fields": {
+      "cliente": 5,
+      "mesero": 2,
+      "mesa": 4,
+      "estado": "entregado",
+      "fecha_creacion": "2026-04-28T20:00:00Z",
+      "fecha_actualizacion": "2026-04-28T21:05:00Z",
+      "total": "40000.00",
+      "metodo_pago": "efectivo",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 12,
+    "fields": {
+      "cliente": 6,
+      "mesero": 3,
+      "mesa": 8,
+      "estado": "cancelado",
+      "fecha_creacion": "2026-05-03T14:20:00Z",
+      "fecha_actualizacion": "2026-05-03T14:25:00Z",
+      "total": "45000.00",
+      "metodo_pago": "tarjeta",
+      "notas": "Error en el pedido, cliente solicitó cancelación"
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 13,
+    "fields": {
+      "cliente": 4,
+      "mesero": 2,
+      "mesa": 1,
+      "estado": "entregado",
+      "fecha_creacion": "2026-05-08T21:00:00Z",
+      "fecha_actualizacion": "2026-05-08T21:40:00Z",
+      "total": "28000.00",
+      "metodo_pago": "simulado",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 14,
+    "fields": {
+      "cliente": 5,
+      "mesero": 3,
+      "mesa": 3,
+      "estado": "entregado",
+      "fecha_creacion": "2026-05-14T13:00:00Z",
+      "fecha_actualizacion": "2026-05-14T14:10:00Z",
+      "total": "55000.00",
+      "metodo_pago": "tarjeta",
+      "notas": ""
+    }
+  },
+  {
+    "model": "orders.pedido",
+    "pk": 15,
+    "fields": {
+      "cliente": 6,
+      "mesero": 2,
+      "mesa": 6,
+      "estado": "en_preparacion",
+      "fecha_creacion": "2026-05-20T19:30:00Z",
+      "fecha_actualizacion": "2026-05-20T19:32:00Z",
+      "total": "57000.00",
+      "metodo_pago": "efectivo",
+      "notas": "El churrasco bien cocido"
+    }
+  },
+
+  {
+    "model": "orders.detallepedido",
+    "pk": 1,
+    "fields": {"pedido": 1, "plato": 1, "cantidad": 2, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 2,
+    "fields": {"pedido": 1, "plato": 8, "cantidad": 1, "precio_unitario": "22000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 3,
+    "fields": {"pedido": 2, "plato": 2, "cantidad": 1, "precio_unitario": "18000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 4,
+    "fields": {"pedido": 2, "plato": 9, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 5,
+    "fields": {"pedido": 3, "plato": 3, "cantidad": 2, "precio_unitario": "9500.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 6,
+    "fields": {"pedido": 3, "plato": 10, "cantidad": 1, "precio_unitario": "10000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 7,
+    "fields": {"pedido": 4, "plato": 4, "cantidad": 1, "precio_unitario": "35000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 8,
+    "fields": {"pedido": 4, "plato": 11, "cantidad": 1, "precio_unitario": "8000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 9,
+    "fields": {"pedido": 5, "plato": 6, "cantidad": 2, "precio_unitario": "32000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 10,
+    "fields": {"pedido": 5, "plato": 11, "cantidad": 2, "precio_unitario": "8000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 11,
+    "fields": {"pedido": 6, "plato": 7, "cantidad": 1, "precio_unitario": "45000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 12,
+    "fields": {"pedido": 6, "plato": 5, "cantidad": 1, "precio_unitario": "28000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 13,
+    "fields": {"pedido": 7, "plato": 1, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 14,
+    "fields": {"pedido": 7, "plato": 8, "cantidad": 1, "precio_unitario": "22000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 15,
+    "fields": {"pedido": 7, "plato": 9, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 16,
+    "fields": {"pedido": 8, "plato": 2, "cantidad": 1, "precio_unitario": "18000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 17,
+    "fields": {"pedido": 9, "plato": 4, "cantidad": 1, "precio_unitario": "35000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 18,
+    "fields": {"pedido": 9, "plato": 9, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 19,
+    "fields": {"pedido": 10, "plato": 3, "cantidad": 2, "precio_unitario": "9500.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 20,
+    "fields": {"pedido": 10, "plato": 6, "cantidad": 1, "precio_unitario": "32000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 21,
+    "fields": {"pedido": 11, "plato": 5, "cantidad": 1, "precio_unitario": "28000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 22,
+    "fields": {"pedido": 11, "plato": 1, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 23,
+    "fields": {"pedido": 12, "plato": 7, "cantidad": 1, "precio_unitario": "45000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 24,
+    "fields": {"pedido": 13, "plato": 2, "cantidad": 1, "precio_unitario": "18000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 25,
+    "fields": {"pedido": 13, "plato": 10, "cantidad": 1, "precio_unitario": "10000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 26,
+    "fields": {"pedido": 14, "plato": 4, "cantidad": 1, "precio_unitario": "35000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 27,
+    "fields": {"pedido": 14, "plato": 11, "cantidad": 1, "precio_unitario": "8000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 28,
+    "fields": {"pedido": 14, "plato": 9, "cantidad": 1, "precio_unitario": "12000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 29,
+    "fields": {"pedido": 15, "plato": 7, "cantidad": 1, "precio_unitario": "45000.00"}
+  },
+  {
+    "model": "orders.detallepedido",
+    "pk": 30,
+    "fields": {"pedido": 15, "plato": 1, "cantidad": 1, "precio_unitario": "12000.00"}
+  }
+]
