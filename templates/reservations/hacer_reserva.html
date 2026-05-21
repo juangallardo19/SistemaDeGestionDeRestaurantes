@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Hacer reserva — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 720px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'reservations:list' %}">Mis reservas</a></li>
+      <li class="breadcrumb-item active">Nueva reserva</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Nueva reserva</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.fecha|as_crispy_field }}</div>
+          <div class="col-md-3">{{ form.hora_inicio|as_crispy_field }}</div>
+          <div class="col-md-3">{{ form.hora_fin|as_crispy_field }}</div>
+        </div>
+
+        <!-- Mesa (se actualiza dinámicamente con JS) -->
+        <div class="mb-3 mt-1">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-table me-1"></i>Mesa disponible
+          </label>
+          {{ form.mesa }}
+          {% if form.mesa.errors %}
+          <div class="text-danger small mt-1">{{ form.mesa.errors }}</div>
+          {% endif %}
+          <div id="disponibilidad-msg" class="form-text text-muted">
+            Seleccioná fecha y horario para ver las mesas disponibles.
+          </div>
+        </div>
+
+        <div class="mb-3">{{ form.numero_personas|as_crispy_field }}</div>
+        <div class="mb-3">{{ form.notas|as_crispy_field }}</div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <hr>
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'reservations:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-calendar-check me-1"></i>Confirmar reserva
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const API_URL = "{% url 'reservations:disponibilidad_mesas' %}";
+  const mesaSelect = document.getElementById('id_mesa');
+  const msg = document.getElementById('disponibilidad-msg');
+
+  function actualizarMesas() {
+    const fecha = document.getElementById('id_fecha').value;
+    const horaInicio = document.getElementById('id_hora_inicio').value;
+    const horaFin = document.getElementById('id_hora_fin').value;
+
+    if (!fecha || !horaInicio || !horaFin) return;
+
+    msg.textContent = 'Buscando mesas disponibles...';
+    msg.className = 'form-text text-info';
+
+    fetch(`${API_URL}?fecha=${fecha}&hora_inicio=${horaInicio}&hora_fin=${horaFin}`)
+      .then(r => r.json())
+      .then(data => {
+        const valorActual = mesaSelect.value;
+        mesaSelect.innerHTML = '<option value="">---------</option>';
+
+        if (data.error) {
+          msg.textContent = data.error;
+          msg.className = 'form-text text-danger';
+          return;
+        }
+
+        if (data.mesas.length === 0) {
+          msg.textContent = 'No hay mesas disponibles en ese horario.';
+          msg.className = 'form-text text-danger';
+          return;
+        }
+
+        data.mesas.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = `Mesa ${m.numero} — ${m.ubicacion} (cap. ${m.capacidad} pers.)`;
+          if (m.id == valorActual) opt.selected = true;
+          mesaSelect.appendChild(opt);
+        });
+
+        msg.textContent = `${data.mesas.length} mesa(s) disponible(s).`;
+        msg.className = 'form-text text-success';
+      })
+      .catch(() => {
+        msg.textContent = 'Error al verificar disponibilidad.';
+        msg.className = 'form-text text-danger';
+      });
+  }
+
+  ['id_fecha', 'id_hora_inicio', 'id_hora_fin'].forEach(id => {
+    document.getElementById(id).addEventListener('change', actualizarMesas);
+  });
+</script>
+{% endblock %}

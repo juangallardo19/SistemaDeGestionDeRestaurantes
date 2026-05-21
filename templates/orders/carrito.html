@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 1000px;">
+
+  <h2 class="mb-4"><i class="bi bi-cart3 me-2"></i>Mi carrito</h2>
+
+  {% if carrito %}
+  <div class="row g-4">
+
+    <!-- Ítems del carrito -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th colspan="2">Plato</th>
+                  <th class="text-center">Cantidad</th>
+                  <th class="text-end">Precio</th>
+                  <th class="text-end">Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in carrito %}
+                <tr>
+                  <td style="width: 64px;">
+                    {% if item.plato.imagen %}
+                    <img src="{{ item.plato.imagen.url }}" alt="{{ item.plato.nombre }}"
+                         class="rounded" style="width:56px; height:56px; object-fit:cover;">
+                    {% else %}
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
+                         style="width:56px; height:56px;">
+                      <i class="bi bi-image text-white"></i>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'menu:detalle_plato' item.plato.pk %}"
+                       class="fw-semibold text-decoration-none">
+                      {{ item.plato.nombre }}
+                    </a>
+                    <div class="text-muted small">{{ item.plato.categoria.nombre }}</div>
+                  </td>
+                  <td class="text-center">
+                    <!-- Auto-submit al cambiar la cantidad -->
+                    <form method="POST" action="{% url 'orders:actualizar_carrito' item.plato.pk %}"
+                          id="form-actualizar-{{ item.plato.pk }}">
+                      {% csrf_token %}
+                      <input type="number" name="cantidad" value="{{ item.cantidad }}"
+                             min="1" max="20"
+                             class="form-control form-control-sm text-center"
+                             style="width: 70px; margin: 0 auto;"
+                             onchange="document.getElementById('form-actualizar-{{ item.plato.pk }}').submit()">
+                    </form>
+                  </td>
+                  <td class="text-end text-muted">${{ item.precio }}</td>
+                  <td class="text-end fw-semibold">${{ item.subtotal }}</td>
+                  <td>
+                    <form method="POST" action="{% url 'orders:remover_del_carrito' item.plato.pk %}"
+                          onsubmit="return confirm('¿Remover {{ item.plato.nombre }} del carrito?')">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Remover">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <a href="{% url 'menu:list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Seguir comprando
+        </a>
+      </div>
+    </div>
+
+    <!-- Resumen del pedido -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-receipt me-1"></i>Resumen</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between text-muted mb-2">
+            <span>Subtotal</span>
+            <span>${{ total }}</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between fw-bold fs-5">
+            <span>Total</span>
+            <span class="text-success">${{ total }}</span>
+          </div>
+        </div>
+        <div class="card-footer d-grid gap-2">
+          <a href="{% url 'orders:crear_pedido' %}" class="btn btn-success btn-lg">
+            <i class="bi bi-bag-check me-1"></i>Confirmar pedido
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-cart-x display-1"></i>
+    <p class="mt-3 fs-5">Tu carrito está vacío.</p>
+    <a href="{% url 'menu:list' %}" class="btn btn-primary mt-2">
+      <i class="bi bi-journal-text me-1"></i>Ver el menú
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

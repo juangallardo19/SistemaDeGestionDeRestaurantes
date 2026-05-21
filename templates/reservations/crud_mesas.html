@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Gestión de mesas — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+
+  <h2 class="mb-4"><i class="bi bi-grid-3x3-gap me-2"></i>Gestión de mesas</h2>
+
+  <div class="row g-4">
+
+    <!-- Tabla de mesas -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Mesas registradas</strong>
+          <span class="badge bg-secondary">{{ mesas|length }}</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Número</th>
+                  <th>Capacidad</th>
+                  <th>Ubicación</th>
+                  <th class="text-center">Estado</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for mesa in mesas %}
+                <tr {% if not mesa.activa %}class="opacity-50"{% endif %}>
+                  <td class="fw-semibold">Mesa {{ mesa.numero }}</td>
+                  <td><i class="bi bi-people me-1 text-muted"></i>{{ mesa.capacidad }}</td>
+                  <td>{{ mesa.get_ubicacion_display }}</td>
+                  <td class="text-center">
+                    {% if mesa.activa %}
+                    <span class="badge bg-success">Activa</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactiva</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex gap-1 justify-content-center">
+                      <a href="{% url 'reservations:editar_mesa' mesa.pk %}"
+                         class="btn btn-outline-warning btn-sm" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <form method="POST" action="{% url 'reservations:toggle_mesa' mesa.pk %}"
+                            onsubmit="return confirm('¿Cambiar estado de Mesa {{ mesa.numero }}?')">
+                        {% csrf_token %}
+                        <button type="submit" title="{% if mesa.activa %}Desactivar{% else %}Activar{% endif %}"
+                                class="btn btn-sm {% if mesa.activa %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                          <i class="bi {% if mesa.activa %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">No hay mesas registradas.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de creación -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <strong><i class="bi bi-plus-circle me-1"></i>Nueva mesa</strong>
+        </div>
+        <div class="card-body">
+          <form method="POST" novalidate>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-success w-100 mt-2">
+              <i class="bi bi-plus-circle me-1"></i>Crear mesa
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancelar reserva — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 500px;">
+  <div class="card shadow border-warning">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>Cancelar reserva
+      </h5>
+    </div>
+    <div class="card-body text-center py-4">
+      <i class="bi bi-calendar-x text-warning" style="font-size: 3rem;"></i>
+      <p class="mt-3 fs-5">
+        ¿Estás seguro que querés cancelar tu reserva?
+      </p>
+      <ul class="list-unstyled text-muted mb-0">
+        <li><i class="bi bi-table me-1"></i><strong>Mesa:</strong> {{ reserva.mesa }}</li>
+        <li><i class="bi bi-calendar me-1"></i><strong>Fecha:</strong> {{ reserva.fecha|date:"d/m/Y" }}</li>
+        <li><i class="bi bi-clock me-1"></i><strong>Horario:</strong> {{ reserva.hora_inicio|time:"H:i" }} – {{ reserva.hora_fin|time:"H:i" }}</li>
+        <li><i class="bi bi-people me-1"></i><strong>Personas:</strong> {{ reserva.numero_personas }}</li>
+      </ul>
+    </div>
+    <div class="card-footer d-flex gap-2 justify-content-center py-3">
+      <a href="{% url 'reservations:list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+      </a>
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+          <i class="bi bi-x-circle me-1"></i>Sí, cancelar reserva
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

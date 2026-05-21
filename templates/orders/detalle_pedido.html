@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pedido #{{ pedido.pk }} — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 960px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      {% if user.is_admin or user.is_mesero %}
+      <li class="breadcrumb-item"><a href="{% url 'orders:list' %}">Pedidos activos</a></li>
+      {% else %}
+      <li class="breadcrumb-item"><a href="{% url 'orders:mis_pedidos' %}">Mis pedidos</a></li>
+      {% endif %}
+      <li class="breadcrumb-item active">Pedido #{{ pedido.pk }}</li>
+    </ol>
+  </nav>
+
+  <!-- Header del pedido -->
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="mb-1"><i class="bi bi-receipt me-2"></i>Pedido #{{ pedido.pk }}</h2>
+      <p class="text-muted mb-0">
+        <i class="bi bi-calendar me-1"></i>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}
+        &nbsp;·&nbsp;
+        <i class="bi bi-credit-card me-1"></i>{{ pedido.get_metodo_pago_display }}
+      </p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      {% include 'orders/_badge_estado.html' with estado=pedido.estado label=pedido.get_estado_display %}
+      {% if user.is_admin or user.is_mesero %}
+      <a href="{% url 'orders:cambiar_estado_pedido' pedido.pk %}"
+         class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-arrow-repeat me-1"></i>Cambiar estado
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Detalle de ítems + notas -->
+    <div class="col-md-8">
+
+      <!-- Ítems -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header">
+          <strong><i class="bi bi-list-ul me-1"></i>Ítems del pedido</strong>
+        </div>
+        <div class="card-body p-0">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Plato</th>
+                <th class="text-center">Cant.</th>
+                <th class="text-end">Precio unit.</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detalle in pedido.detalles.all %}
+              <tr>
+                <td>
+                  <span class="fw-semibold">{{ detalle.plato.nombre }}</span>
+                  <div class="text-muted small">{{ detalle.plato.categoria.nombre }}</div>
+                </td>
+                <td class="text-center">{{ detalle.cantidad }}</td>
+                <td class="text-end text-muted">${{ detalle.precio_unitario }}</td>
+                <td class="text-end fw-semibold">${{ detalle.subtotal }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="table-success">
+                <td colspan="3" class="fw-bold">Total</td>
+                <td class="text-end fw-bold fs-5 text-success">${{ pedido.total }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      {% if pedido.notas %}
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <strong><i class="bi bi-chat-left-text me-1"></i>Notas del pedido</strong>
+        </div>
+        <div class="card-body">
+          <p class="mb-0 text-muted">{{ pedido.notas }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Panel lateral: info + acciones admin -->
+    <div class="col-md-4">
+
+      <!-- Info del cliente / mesero -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header">
+          <strong><i class="bi bi-person me-1"></i>Información</strong>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Cliente</span>
+            <span>{{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Mesero</span>
+            <span>{{ pedido.mesero.get_full_name|default:pedido.mesero.username|default:"Sin asignar" }}</span>
+          </li>
+          {% if pedido.mesa %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Mesa</span>
+            <span>Mesa {{ pedido.mesa.numero }}</span>
+          </li>
+          {% endif %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Última actualización</span>
+            <span class="small">{{ pedido.fecha_actualizacion|date:"d/m/Y H:i" }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Asignar mesero (solo admin) -->
+      {% if asignar_form %}
+      <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning bg-opacity-10">
+          <strong><i class="bi bi-person-badge me-1"></i>Asignar mesero</strong>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            {{ asignar_form|crispy }}
+            <button type="submit" class="btn btn-warning w-100 mt-2">
+              <i class="bi bi-check-circle me-1"></i>Asignar
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

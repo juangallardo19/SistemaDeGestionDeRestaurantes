@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registrar movimiento — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 620px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'inventory:list' %}">Inventario</a></li>
+      <li class="breadcrumb-item active">Registrar movimiento</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Registrar movimiento de stock</h4>
+    </div>
+    <div class="card-body">
+
+      <!-- Guía de tipos -->
+      <div class="alert alert-info py-2 mb-4">
+        <strong><i class="bi bi-info-circle me-1"></i>Tipos de movimiento:</strong>
+        <ul class="mb-0 mt-1 small">
+          <li><strong>Entrada:</strong> Suma la cantidad al stock actual (ej: compra de insumos).</li>
+          <li><strong>Salida:</strong> Resta la cantidad al stock actual (ej: merma, uso manual).</li>
+          <li><strong>Ajuste:</strong> Establece el stock a un valor exacto (ej: conteo físico).</li>
+        </ul>
+      </div>
+
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <hr>
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i>Registrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Muestra el stock actual del ingrediente seleccionado
+  const select = document.getElementById('id_ingrediente');
+  const info = document.createElement('div');
+  info.className = 'form-text text-muted mt-1';
+  select.parentElement.appendChild(info);
+
+  select.addEventListener('change', function () {
+    // El stock actual se muestra en servidor; aquí solo limpiamos el mensaje
+    info.textContent = '';
+  });
+</script>
+{% endblock %}

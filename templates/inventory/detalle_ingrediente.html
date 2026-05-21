@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ingrediente.nombre }} — Inventario — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'inventory:list' %}">Inventario</a></li>
+      <li class="breadcrumb-item active">{{ ingrediente.nombre }}</li>
+    </ol>
+  </nav>
+
+  <!-- Tarjeta del ingrediente -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm {% if ingrediente.stock_bajo %}border-danger{% endif %}">
+        <div class="card-header {% if ingrediente.stock_bajo %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
+          <h5 class="mb-0">
+            <i class="bi bi-box-seam me-2"></i>{{ ingrediente.nombre }}
+          </h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Unidad</span>
+            <strong>{{ ingrediente.unidad_medida }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Stock actual</span>
+            <strong class="{% if ingrediente.stock_bajo %}text-danger{% else %}text-success{% endif %}">
+              {{ ingrediente.stock_actual }}
+            </strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Stock mínimo</span>
+            <strong>{{ ingrediente.stock_minimo }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Estado</span>
+            {% if not ingrediente.activo %}
+            <span class="badge bg-secondary">Inactivo</span>
+            {% elif ingrediente.stock_bajo %}
+            <span class="badge bg-danger">Stock bajo</span>
+            {% else %}
+            <span class="badge bg-success">OK</span>
+            {% endif %}
+          </li>
+        </ul>
+        <div class="card-footer">
+          <a href="{% url 'inventory:registrar_movimiento' %}" class="btn btn-primary w-100 btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Registrar movimiento
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta de stock bajo -->
+    <div class="col-md-8 align-self-start">
+      {% if ingrediente.stock_bajo %}
+      <div class="alert alert-danger d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+        <div>
+          <strong>Stock por debajo del mínimo.</strong>
+          El stock actual ({{ ingrediente.stock_actual }}) es menor o igual al mínimo requerido
+          ({{ ingrediente.stock_minimo }} {{ ingrediente.unidad_medida }}).
+          Registrá una entrada de inventario.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Historial de movimientos del ingrediente -->
+  <h4 class="mb-3"><i class="bi bi-clock-history me-2"></i>Historial de movimientos</h4>
+
+  {% if movimientos %}
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Fecha</th>
+              <th class="text-center">Tipo</th>
+              <th class="text-end">Cantidad</th>
+              <th class="text-end">Stock resultante</th>
+              <th>Responsable</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mov in movimientos %}
+            <tr>
+              <td class="small">
+                {{ mov.fecha|date:"d/m/Y" }}
+                <span class="text-muted">{{ mov.fecha|time:"H:i" }}</span>
+              </td>
+              <td class="text-center">
+                {% if mov.tipo == 'entrada' %}
+                <span class="badge bg-success"><i class="bi bi-plus-circle me-1"></i>Entrada</span>
+                {% elif mov.tipo == 'salida' %}
+                <span class="badge bg-danger"><i class="bi bi-dash-circle me-1"></i>Salida</span>
+                {% else %}
+                <span class="badge bg-warning text-dark"><i class="bi bi-arrow-repeat me-1"></i>Ajuste</span>
+                {% endif %}
+              </td>
+              <td class="text-end fw-semibold
+                          {% if mov.tipo == 'entrada' %}text-success
+                          {% elif mov.tipo == 'salida' %}text-danger{% endif %}">
+                {% if mov.tipo == 'entrada' %}+{% elif mov.tipo == 'salida' %}-{% endif %}{{ mov.cantidad }}
+                <span class="text-muted fw-normal small">{{ ingrediente.unidad_medida }}</span>
+              </td>
+              <td class="text-end text-muted">
+                {{ mov.stock_resultante }}
+                <span class="small">{{ ingrediente.unidad_medida }}</span>
+              </td>
+              <td class="small">{{ mov.responsable.get_full_name|default:mov.responsable.username }}</td>
+              <td class="text-muted small">{{ mov.motivo|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center py-4 text-muted">
+    <i class="bi bi-inbox display-4"></i>
+    <p class="mt-2">No hay movimientos registrados para este ingrediente.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
