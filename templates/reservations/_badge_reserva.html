@@ -1,0 +1,11 @@
+{% if estado == 'pendiente' %}
+<span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>{{ label }}</span>
+{% elif estado == 'confirmada' %}
+<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>{{ label }}</span>
+{% elif estado == 'cancelada' %}
+<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>{{ label }}</span>
+{% elif estado == 'completada' %}
+<span class="badge bg-secondary"><i class="bi bi-archive me-1"></i>{{ label }}</span>
+{% else %}
+<span class="badge bg-secondary">{{ label }}</span>
+{% endif %}
