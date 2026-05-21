@@ -217,13 +217,45 @@
           <thead class="table-light">
             <tr>
               <th class="px-4 py-3">#</th>
-              <th>Cliente</th>
+              <th>
+                <a href="?{{ query_string }}&orden={% if orden == 'cliente__first_name' %}-cliente__first_name{% else %}cliente__first_name{% endif %}"
+                   class="text-decoration-none text-reset d-flex align-items-center gap-1">
+                  Cliente
+                  {% if orden == 'cliente__first_name' %}<i class="bi bi-sort-alpha-down" style="font-size:.8rem;"></i>
+                  {% elif orden == '-cliente__first_name' %}<i class="bi bi-sort-alpha-up" style="font-size:.8rem;"></i>
+                  {% else %}<i class="bi bi-arrow-down-up text-muted" style="font-size:.7rem;opacity:.5;"></i>{% endif %}
+                </a>
+              </th>
               <th>Mesero</th>
               <th>Mesa</th>
-              <th class="text-center">Estado</th>
+              <th class="text-center">
+                <a href="?{{ query_string }}&orden={% if orden == 'estado' %}-estado{% else %}estado{% endif %}"
+                   class="text-decoration-none text-reset d-flex align-items-center justify-content-center gap-1">
+                  Estado
+                  {% if orden == 'estado' %}<i class="bi bi-sort-alpha-down" style="font-size:.8rem;"></i>
+                  {% elif orden == '-estado' %}<i class="bi bi-sort-alpha-up" style="font-size:.8rem;"></i>
+                  {% else %}<i class="bi bi-arrow-down-up text-muted" style="font-size:.7rem;opacity:.5;"></i>{% endif %}
+                </a>
+              </th>
               <th class="text-center">Método</th>
-              <th class="text-end">Total</th>
-              <th class="text-end px-4">Fecha</th>
+              <th class="text-end">
+                <a href="?{{ query_string }}&orden={% if orden == '-total' %}total{% else %}-total{% endif %}"
+                   class="text-decoration-none text-reset d-flex align-items-center justify-content-end gap-1">
+                  Total
+                  {% if orden == 'total' %}<i class="bi bi-sort-numeric-down" style="font-size:.8rem;"></i>
+                  {% elif orden == '-total' %}<i class="bi bi-sort-numeric-up" style="font-size:.8rem;"></i>
+                  {% else %}<i class="bi bi-arrow-down-up text-muted" style="font-size:.7rem;opacity:.5;"></i>{% endif %}
+                </a>
+              </th>
+              <th class="text-end px-4">
+                <a href="?{{ query_string }}&orden={% if orden == '-fecha_creacion' %}fecha_creacion{% else %}-fecha_creacion{% endif %}"
+                   class="text-decoration-none text-reset d-flex align-items-center justify-content-end gap-1">
+                  Fecha
+                  {% if orden == 'fecha_creacion' %}<i class="bi bi-sort-up" style="font-size:.8rem;"></i>
+                  {% elif orden == '-fecha_creacion' %}<i class="bi bi-sort-down" style="font-size:.8rem;"></i>
+                  {% else %}<i class="bi bi-arrow-down-up text-muted" style="font-size:.7rem;opacity:.5;"></i>{% endif %}
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>

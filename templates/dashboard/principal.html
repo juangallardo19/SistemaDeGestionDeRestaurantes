@@ -309,7 +309,22 @@
     </div>
   </div>
 
-  <!-- ══ Sección 6: Exportaciones ══════════════════════════ -->
+  <!-- ══ Sección 6: Acceso rápido historial ══════════════════ -->
+  <div class="chart-section mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <p class="chart-section-title mb-1">
+          <i class="bi bi-clock-history me-1"></i>Historial de pedidos
+        </p>
+        <p class="text-muted small mb-0">Consultá, filtrá y ordená todos los pedidos del sistema.</p>
+      </div>
+      <a href="{% url 'orders:historial_pedidos' %}" class="btn btn-primary-custom btn-sm">
+        <i class="bi bi-journal-text me-1"></i>Ver historial completo
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ Sección 7: Exportaciones ══════════════════════════ -->
   <div class="chart-section mb-4">
     <p class="chart-section-title mb-3">
       <i class="bi bi-download me-1"></i>Exportar reportes

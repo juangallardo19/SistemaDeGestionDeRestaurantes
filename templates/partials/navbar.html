@@ -25,7 +25,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link nav-link-custom" href="{% url 'menu:list' %}">
-                        <i class="fa-solid fa-book-open me-1" aria-hidden="true"></i>Menú
+                        <i class="fa-solid fa-book-open me-1" aria-hidden="true"></i>Orden
                     </a>
                 </li>
 
@@ -39,11 +39,6 @@
 
                 {% if user.is_mesero or user.is_admin %}
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="{% url 'orders:cart' %}">
-                        <i class="fa-solid fa-cart-plus me-1" aria-hidden="true"></i>Tomar pedido
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link nav-link-custom" href="{% url 'orders:list' %}">
                         <i class="fa-solid fa-receipt me-1" aria-hidden="true"></i>Pedidos
                     </a>
@@ -51,6 +46,11 @@
                 <li class="nav-item">
                     <a class="nav-link nav-link-custom" href="{% url 'reservations:mesas_overview' %}">
                         <i class="fa-solid fa-chair me-1" aria-hidden="true"></i>Mesas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'reservations:lista_reservas' %}">
+                        <i class="fa-solid fa-calendar-check me-1" aria-hidden="true"></i>Reservas
                     </a>
                 </li>
                 {% endif %}
@@ -65,6 +65,11 @@
                         <li>
                             <a class="dropdown-item" href="{% url 'dashboard:principal' %}">
                                 <i class="fa-solid fa-chart-line me-2" aria-hidden="true"></i>Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'orders:historial_pedidos' %}">
+                                <i class="fa-solid fa-clock-rotate-left me-2" aria-hidden="true"></i>Historial de pedidos
                             </a>
                         </li>
                         <li>

@@ -312,9 +312,8 @@ def cambiar_estado_pedido(request, pk):
 
 @admin_required
 def historial_pedidos(request):
-    qs = Pedido.objects.select_related('cliente', 'mesero').prefetch_related('detalles')
+    qs = Pedido.objects.select_related('cliente', 'mesero', 'mesa').prefetch_related('detalles')
 
-    # Translate legacy single-date param to range for PedidoFilter
     get_data = request.GET.copy()
     if get_data.get('fecha') and not get_data.get('fecha_desde'):
         get_data['fecha_desde'] = get_data['fecha']
@@ -322,10 +321,30 @@ def historial_pedidos(request):
 
     pedidos_qs = PedidoFilter(get_data, qs).filter()
 
+    # Ordenamiento
+    orden = request.GET.get('orden', '-fecha_creacion')
+    ORDENES_VALIDOS = {
+        'fecha_creacion', '-fecha_creacion',
+        'total', '-total',
+        'estado', '-estado',
+        'cliente__first_name', '-cliente__first_name',
+    }
+    if orden not in ORDENES_VALIDOS:
+        orden = '-fecha_creacion'
+    pedidos_qs = pedidos_qs.order_by(orden)
+
     totales = pedidos_qs.aggregate(
         total_ingresos=Sum('total'),
         total_count=Count('pk'),
     )
+    total_ingresos = totales['total_ingresos'] or Decimal('0')
+    total_count = totales['total_count'] or 0
+    ticket_promedio = (total_ingresos / total_count).quantize(Decimal('0.01')) if total_count else Decimal('0')
+
+    # Query string sin 'page' para preservar filtros en paginación
+    qd = request.GET.copy()
+    qd.pop('page', None)
+    query_string = qd.urlencode()
 
     paginator = Paginator(pedidos_qs, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -334,10 +353,17 @@ def historial_pedidos(request):
         'pedidos': page_obj,
         'page_obj': page_obj,
         'estado_choices': Pedido.ESTADO_CHOICES,
+        'metodo_choices': Pedido.METODO_PAGO_CHOICES,
         'estado_filtro': request.GET.get('estado', ''),
-        'fecha_filtro': request.GET.get('fecha', ''),
-        'total_ingresos': totales['total_ingresos'] or Decimal('0'),
-        'total_count': totales['total_count'] or 0,
+        'metodo_filtro': request.GET.get('metodo_pago', ''),
+        'cliente_filtro': request.GET.get('cliente', ''),
+        'fecha_desde': request.GET.get('fecha_desde', ''),
+        'fecha_hasta': request.GET.get('fecha_hasta', ''),
+        'total_ingresos': total_ingresos,
+        'total_pedidos': total_count,
+        'ticket_promedio': ticket_promedio,
+        'query_string': query_string,
+        'orden': orden,
     })
 
 

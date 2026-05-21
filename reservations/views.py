@@ -73,13 +73,18 @@ def lista_reservas(request):
         if form.cleaned_data.get('estado'):
             qs = qs.filter(estado=form.cleaned_data['estado'])
 
-    paginator = Paginator(qs, 20)
+    activas = qs.filter(estado__in=['pendiente', 'confirmada']).order_by('fecha', 'hora_inicio')
+    historial = qs.filter(estado__in=['completada', 'cancelada']).order_by('-fecha', '-hora_inicio')
+
+    paginator = Paginator(historial, 15)
     page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'reservations/lista_reservas.html', {
-        'reservas': page_obj,
+        'activas': activas,
+        'historial': page_obj,
         'page_obj': page_obj,
         'form': form,
+        'total_pendientes': activas.filter(estado='pendiente').count(),
     })
 
 

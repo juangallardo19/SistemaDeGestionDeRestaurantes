@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "username": "admin1",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "admin@restaurapp.co",
       "first_name": "Admin",
       "last_name": "General",
@@ -25,7 +25,7 @@
     "pk": 2,
     "fields": {
       "username": "mesero1",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "carlos.ramirez@restaurapp.co",
       "first_name": "Carlos",
       "last_name": "Ramírez",
@@ -46,7 +46,7 @@
     "pk": 3,
     "fields": {
       "username": "mesero2",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "ana.gomez@restaurapp.co",
       "first_name": "Ana",
       "last_name": "Gómez",
@@ -67,7 +67,7 @@
     "pk": 4,
     "fields": {
       "username": "cliente1",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "juan.perez@email.co",
       "first_name": "Juan",
       "last_name": "Pérez",
@@ -88,7 +88,7 @@
     "pk": 5,
     "fields": {
       "username": "cliente2",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "maria.lopez@email.co",
       "first_name": "María",
       "last_name": "López",
@@ -109,7 +109,7 @@
     "pk": 6,
     "fields": {
       "username": "cliente3",
-      "password": "!Demo1234!",
+      "password": "pbkdf2_sha256$600000$FTB1uOHUsxwujf028KB21x$y8OoSXyudw4km218f4KG3lyrGSrserQ2TMyOrvIO2cs=",
       "email": "luis.torres@email.co",
       "first_name": "Luis",
       "last_name": "Torres",
