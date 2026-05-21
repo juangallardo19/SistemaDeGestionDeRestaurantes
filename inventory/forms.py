@@ -5,32 +5,6 @@ from menu.models import Ingrediente, PlatoIngrediente
 from .models import MovimientoInventario
 
 
-class IngredienteForm(forms.ModelForm):
-    class Meta:
-        model = Ingrediente
-        fields = ['nombre', 'unidad_medida', 'stock_actual', 'stock_minimo']
-        widgets = {
-            'nombre': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: Harina de trigo',
-            }),
-            'unidad_medida': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: kg, litros, unidades',
-            }),
-            'stock_actual': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'min': '0',
-            }),
-            'stock_minimo': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'min': '0',
-            }),
-        }
-
-
 class PlatoIngredienteForm(forms.ModelForm):
     class Meta:
         model = PlatoIngrediente

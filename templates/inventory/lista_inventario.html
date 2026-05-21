@@ -18,8 +18,8 @@
         <i class="bi bi-arrow-left-right me-1"></i>Registrar movimiento
       </a>
       {% if user.is_admin %}
-      <a href="{% url 'inventory:crear_ingrediente' %}" class="btn btn-primary-custom btn-sm">
-        <i class="bi bi-plus-circle me-1"></i>Nuevo ingrediente
+      <a href="{% url 'menu:lista_ingredientes' %}" class="btn btn-primary-custom btn-sm">
+        <i class="bi bi-pencil-square me-1"></i>Gestionar ingredientes
       </a>
       {% endif %}
     </div>
@@ -68,7 +68,7 @@
               <th class="text-end">Stock mínimo</th>
               <th style="width:180px;">Nivel</th>
               <th class="text-center">Estado</th>
-              <th class="text-center pe-4">Acción</th>
+              <th class="text-center pe-4">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -122,10 +122,25 @@
 
               <!-- Acción -->
               <td class="text-center pe-4">
-                <a href="{% url 'inventory:registrar_movimiento' %}?ingrediente={{ ing.pk }}"
-                   class="btn btn-sm btn-outline-secondary" title="Registrar movimiento">
-                  <i class="bi bi-arrow-left-right me-1"></i>Movimiento
-                </a>
+                <div class="d-flex gap-1 justify-content-center">
+                  <a href="{% url 'inventory:registrar_movimiento' %}?ingrediente={{ ing.pk }}"
+                     class="btn btn-sm btn-outline-secondary" title="Registrar movimiento">
+                    <i class="bi bi-arrow-left-right"></i>
+                  </a>
+                  {% if user.is_admin %}
+                  <a href="{% url 'menu:editar_ingrediente' ing.pk %}"
+                     class="btn btn-sm btn-outline-warning" title="Editar ingrediente">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <form method="POST" action="{% url 'menu:eliminar_ingrediente' ing.pk %}"
+                        onsubmit="return confirm('¿Desactivar «{{ ing.nombre }}»?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Desactivar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
               </td>
             </tr>
             {% empty %}

@@ -39,9 +39,14 @@
       <i class="fa-solid fa-book-open fs-4" style="color:var(--color-primary);"></i>
       <h2 class="mb-0">Recetas de Platos</h2>
     </div>
-    <a href="{% url 'inventory:list' %}" class="btn btn-sm btn-outline-secondary">
-      <i class="fa-solid fa-arrow-left me-1"></i>Inventario
-    </a>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'inventory:list' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Inventario
+      </a>
+      <a href="{% url 'menu:crear_plato' %}" class="btn btn-sm btn-primary-custom">
+        <i class="fa-solid fa-plus me-1"></i>Nuevo plato
+      </a>
+    </div>
   </div>
 
   {% if sin_receta_count %}
@@ -65,7 +70,7 @@
         <div class="fw-semibold">{{ item.plato.nombre }}</div>
         <div class="text-muted small">{{ item.plato.categoria.nombre }}</div>
       </div>
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
         {% if item.sin_receta %}
         <span class="pill-ingredientes pill-warn">
           <i class="fa-solid fa-triangle-exclamation"></i>Sin ingredientes
@@ -76,9 +81,21 @@
         </span>
         {% endif %}
         <a href="{% url 'inventory:editar_receta' item.plato.pk %}"
-           class="btn btn-sm {% if item.sin_receta %}btn-warning{% else %}btn-outline-secondary{% endif %}">
-          <i class="fa-solid fa-pencil me-1"></i>Editar receta
+           class="btn btn-sm {% if item.sin_receta %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+           title="Editar ingredientes de la receta">
+          <i class="fa-solid fa-list-ul me-1"></i>Ingredientes
         </a>
+        <a href="{% url 'menu:editar_plato' item.plato.pk %}"
+           class="btn btn-sm btn-outline-primary" title="Editar datos del plato">
+          <i class="fa-solid fa-pen"></i>
+        </a>
+        <form method="POST" action="{% url 'menu:eliminar_plato' item.plato.pk %}"
+              onsubmit="return confirm('¿Desactivar el plato «{{ item.plato.nombre }}»?')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-danger" title="Desactivar plato">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
       </div>
     </div>
     {% empty %}

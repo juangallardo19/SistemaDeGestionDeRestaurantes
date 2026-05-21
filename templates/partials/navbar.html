@@ -78,13 +78,35 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'inventory:crear_ingrediente' %}">
-                                <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Nuevo ingrediente
+                            <a class="dropdown-item" href="{% url 'menu:lista_ingredientes' %}">
+                                <i class="fa-solid fa-carrot me-2" aria-hidden="true"></i>Ingredientes
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="{% url 'menu:crear_ingrediente' %}">
+                                <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Nuevo ingrediente
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'menu:list' %}">
+                                <i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>Menú / Platos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'menu:crear_plato' %}">
+                                <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Nuevo plato
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'menu:lista_categorias' %}">
+                                <i class="fa-solid fa-tags me-2" aria-hidden="true"></i>Categorías
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
                             <a class="dropdown-item" href="{% url 'inventory:recetas' %}">
-                                <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Recetas
+                                <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Recetas de platos
                             </a>
                         </li>
                         <li>
