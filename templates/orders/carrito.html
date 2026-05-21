@@ -3,71 +3,104 @@
 {% block title %}Carrito — RestaurApp{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 1000px;">
+<div class="container-fluid px-2 px-md-4">
 
-  <h2 class="mb-4"><i class="bi bi-cart3 me-2"></i>Mi carrito</h2>
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-cart3 fs-4 text-primary-warm"></i>
+    <h2 class="mb-0">Mi Carrito</h2>
+  </div>
 
   {% if carrito %}
-  <div class="row g-4">
+  <div class="row g-4 align-items-start">
 
-    <!-- Ítems del carrito -->
+    <!-- Tabla de ítems -->
     <div class="col-lg-8">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold text-muted small">
+            {{ carrito|length }} ítem{% if carrito|length != 1 %}s{% endif %} en tu pedido
+          </span>
+        </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-              <thead class="table-dark">
+              <thead class="table-light">
                 <tr>
-                  <th colspan="2">Plato</th>
-                  <th class="text-center">Cantidad</th>
-                  <th class="text-end">Precio</th>
-                  <th class="text-end">Subtotal</th>
-                  <th></th>
+                  <th class="px-4 py-3" colspan="2">Plato</th>
+                  <th class="text-end pe-3">Precio</th>
+                  <th class="text-center" style="width:160px;">Cantidad</th>
+                  <th class="text-end pe-3">Subtotal</th>
+                  <th style="width:50px;"></th>
                 </tr>
               </thead>
               <tbody>
                 {% for item in carrito %}
                 <tr>
-                  <td style="width: 64px;">
+                  <!-- Miniatura -->
+                  <td class="ps-4 py-3" style="width:68px;">
                     {% if item.plato.imagen %}
-                    <img src="{{ item.plato.imagen.url }}" alt="{{ item.plato.nombre }}"
-                         class="rounded" style="width:56px; height:56px; object-fit:cover;">
+                      <img src="{{ item.plato.imagen.url }}"
+                           alt="{{ item.plato.nombre }}"
+                           class="rounded-2"
+                           style="width:54px;height:54px;object-fit:cover;">
                     {% else %}
-                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
-                         style="width:56px; height:56px;">
-                      <i class="bi bi-image text-white"></i>
-                    </div>
+                      <div class="rounded-2 bg-light d-flex align-items-center justify-content-center"
+                           style="width:54px;height:54px;">
+                        <i class="bi bi-image text-secondary fs-5"></i>
+                      </div>
                     {% endif %}
                   </td>
-                  <td>
+
+                  <!-- Nombre + categoría -->
+                  <td class="py-3">
                     <a href="{% url 'menu:detalle_plato' item.plato.pk %}"
-                       class="fw-semibold text-decoration-none">
+                       class="fw-semibold text-decoration-none lh-sm d-block">
                       {{ item.plato.nombre }}
                     </a>
-                    <div class="text-muted small">{{ item.plato.categoria.nombre }}</div>
+                    <small class="text-muted">{{ item.plato.categoria.nombre }}</small>
                   </td>
-                  <td class="text-center">
-                    <!-- Auto-submit al cambiar la cantidad -->
-                    <form method="POST" action="{% url 'orders:actualizar_carrito' item.plato.pk %}"
-                          id="form-actualizar-{{ item.plato.pk }}">
+
+                  <!-- Precio unitario -->
+                  <td class="text-end pe-3 text-muted">${{ item.precio }}</td>
+
+                  <!-- Cantidad editable -->
+                  <td class="text-center px-2">
+                    <form method="post"
+                          action="{% url 'orders:actualizar_carrito' item.plato.pk %}"
+                          class="d-flex align-items-center justify-content-center gap-1"
+                          data-no-spinner>
                       {% csrf_token %}
-                      <input type="number" name="cantidad" value="{{ item.cantidad }}"
-                             min="1" max="20"
+                      <input type="number"
+                             name="cantidad"
+                             value="{{ item.cantidad }}"
+                             min="1" max="99"
                              class="form-control form-control-sm text-center"
-                             style="width: 70px; margin: 0 auto;"
-                             onchange="document.getElementById('form-actualizar-{{ item.plato.pk }}').submit()">
-                    </form>
-                  </td>
-                  <td class="text-end text-muted">${{ item.precio }}</td>
-                  <td class="text-end fw-semibold">${{ item.subtotal }}</td>
-                  <td>
-                    <form method="POST" action="{% url 'orders:remover_del_carrito' item.plato.pk %}"
-                          onsubmit="return confirm('¿Remover {{ item.plato.nombre }} del carrito?')">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Remover">
-                        <i class="bi bi-trash"></i>
+                             style="width:58px;"
+                             aria-label="Cantidad">
+                      <button type="submit"
+                              class="btn btn-sm btn-outline-secondary"
+                              title="Actualizar">
+                        <i class="bi bi-arrow-clockwise"></i>
                       </button>
                     </form>
+                  </td>
+
+                  <!-- Subtotal -->
+                  <td class="text-end pe-3 fw-semibold">${{ item.subtotal }}</td>
+
+                  <!-- Quitar -->
+                  <td class="pe-3">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            title="Quitar del carrito"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmModal"
+                            data-confirm-url="{% url 'orders:remover_del_carrito' item.plato.pk %}"
+                            data-confirm-title="Quitar del carrito"
+                            data-confirm-message="¿Quitar &laquo;{{ item.plato.nombre }}&raquo; del pedido?"
+                            data-confirm-btn="Quitar">
+                      <i class="bi bi-trash3"></i>
+                    </button>
                   </td>
                 </tr>
                 {% endfor %}
@@ -75,35 +108,39 @@
             </table>
           </div>
         </div>
-      </div>
-
-      <div class="mt-3">
-        <a href="{% url 'menu:list' %}" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left me-1"></i>Seguir comprando
-        </a>
+        <div class="card-footer bg-transparent border-top py-3 px-4">
+          <a href="{% url 'menu:list' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Seguir explorando el menú
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Resumen del pedido -->
+    <!-- Resumen lateral -->
     <div class="col-lg-4">
-      <div class="card shadow-sm">
-        <div class="card-header">
-          <h5 class="mb-0"><i class="bi bi-receipt me-1"></i>Resumen</h5>
+      <div class="card shadow-sm border-0 rounded-3 sticky-top" style="top:80px;">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold">Resumen del pedido</span>
         </div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between text-muted mb-2">
-            <span>Subtotal</span>
-            <span>${{ total }}</span>
+        <div class="card-body px-4 py-3">
+          {% for item in carrito %}
+          <div class="d-flex justify-content-between align-items-baseline py-1">
+            <span class="text-muted small">
+              {{ item.plato.nombre }}
+              <span class="text-secondary">× {{ item.cantidad }}</span>
+            </span>
+            <span class="small fw-medium">${{ item.subtotal }}</span>
           </div>
-          <hr>
-          <div class="d-flex justify-content-between fw-bold fs-5">
-            <span>Total</span>
-            <span class="text-success">${{ total }}</span>
+          {% endfor %}
+          <hr class="my-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold fs-5">Total</span>
+            <span class="fw-bold fs-5 text-primary-warm">${{ total }}</span>
           </div>
         </div>
-        <div class="card-footer d-grid gap-2">
-          <a href="{% url 'orders:crear_pedido' %}" class="btn btn-success btn-lg">
-            <i class="bi bi-bag-check me-1"></i>Confirmar pedido
+        <div class="card-footer bg-transparent border-top py-3 px-4">
+          <a href="{% url 'orders:crear_pedido' %}" class="btn btn-primary-custom w-100">
+            <i class="bi bi-bag-check me-2"></i>Confirmar pedido
           </a>
         </div>
       </div>
@@ -112,14 +149,25 @@
   </div>
 
   {% else %}
-  <div class="text-center py-5 text-muted">
-    <i class="bi bi-cart-x display-1"></i>
-    <p class="mt-3 fs-5">Tu carrito está vacío.</p>
-    <a href="{% url 'menu:list' %}" class="btn btn-primary mt-2">
-      <i class="bi bi-journal-text me-1"></i>Ver el menú
-    </a>
-  </div>
-  {% endif %}
 
+  <!-- Carrito vacío -->
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card border-0 shadow-sm rounded-3 text-center py-5 px-4">
+        <div class="mb-3">
+          <i class="bi bi-cart-x" style="font-size:4rem;color:var(--color-primary);opacity:.25;"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Tu carrito está vacío</h4>
+        <p class="text-muted mb-4">
+          Aún no agregaste ningún plato. Explorá el menú y elegí lo que más te guste.
+        </p>
+        <a href="{% url 'menu:list' %}" class="btn btn-primary-custom">
+          <i class="bi bi-journal-text me-2"></i>Ver el menú
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
 </div>
 {% endblock %}

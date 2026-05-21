@@ -4,26 +4,37 @@
 {% block title %}Todas las reservas — RestaurApp{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4">
+<div class="container-fluid px-2 px-md-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Todas las reservas</h2>
-    <span class="badge bg-secondary fs-6">{{ reservas|length }} resultado{{ reservas|length|pluralize }}</span>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-calendar3 fs-4 text-primary-warm"></i>
+      <h2 class="mb-0">Todas las Reservas</h2>
+    </div>
+    <a href="{% url 'reservations:hacer_reserva' %}" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-calendar-plus me-1"></i>Nueva reserva
+    </a>
   </div>
 
   <!-- Filtros -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-body">
-      <form method="GET" class="row g-3 align-items-end">
-        <div class="col-sm-3">{{ form.fecha_desde|as_crispy_field }}</div>
-        <div class="col-sm-3">{{ form.fecha_hasta|as_crispy_field }}</div>
-        <div class="col-sm-3">{{ form.estado|as_crispy_field }}</div>
+  <div class="card shadow-sm border-0 rounded-3 mb-4">
+    <div class="card-body px-4 py-3">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-sm-3">
+          {{ form.fecha_desde|as_crispy_field }}
+        </div>
+        <div class="col-sm-3">
+          {{ form.fecha_hasta|as_crispy_field }}
+        </div>
+        <div class="col-sm-3">
+          {{ form.estado|as_crispy_field }}
+        </div>
         <div class="col-sm-3 d-flex gap-2">
-          <button type="submit" class="btn btn-primary flex-grow-1">
+          <button type="submit" class="btn btn-primary-custom flex-grow-1">
             <i class="bi bi-search me-1"></i>Filtrar
           </button>
           {% if request.GET %}
-          <a href="{% url 'reservations:lista_reservas' %}" class="btn btn-outline-secondary">
+          <a href="{% url 'reservations:lista_reservas' %}" class="btn btn-outline-secondary" title="Limpiar filtros">
             <i class="bi bi-x-circle"></i>
           </a>
           {% endif %}
@@ -33,52 +44,74 @@
   </div>
 
   {% if reservas %}
-  <div class="card shadow-sm">
+
+  <!-- Contador de resultados -->
+  <p class="text-muted small mb-2">
+    {% if page_obj %}
+      {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize }} encontrada{{ page_obj.paginator.count|pluralize }}
+    {% else %}
+      {{ reservas|length }} reserva{{ reservas|length|pluralize }}
+    {% endif %}
+  </p>
+
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden mb-4">
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-          <thead class="table-dark">
+          <thead class="table-light">
             <tr>
-              <th>#</th>
+              <th class="px-4 py-3">#</th>
               <th>Cliente</th>
               <th>Mesa</th>
               <th>Fecha</th>
               <th>Horario</th>
               <th class="text-center">Personas</th>
               <th class="text-center">Estado</th>
-              <th class="text-center">Acciones</th>
+              <th class="text-center pe-4">Acción</th>
             </tr>
           </thead>
           <tbody>
             {% for reserva in reservas %}
             <tr>
-              <td class="text-muted">{{ reserva.pk }}</td>
+              <td class="px-4 text-muted">{{ reserva.pk }}</td>
               <td>
-                {{ reserva.cliente.get_full_name|default:reserva.cliente.username }}
-                <div class="text-muted small">{{ reserva.cliente.email }}</div>
+                <span class="fw-medium d-block lh-sm">
+                  {{ reserva.cliente.get_full_name|default:reserva.cliente.username }}
+                </span>
+                <small class="text-muted">{{ reserva.cliente.email }}</small>
               </td>
               <td>
-                <strong>Mesa {{ reserva.mesa.numero }}</strong>
-                <div class="text-muted small">{{ reserva.mesa.get_ubicacion_display }}</div>
+                <span class="fw-semibold d-block lh-sm">Mesa {{ reserva.mesa.numero }}</span>
+                <small class="text-muted">{{ reserva.mesa.get_ubicacion_display }}</small>
               </td>
-              <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
-              <td class="small">{{ reserva.hora_inicio|time:"H:i" }} – {{ reserva.hora_fin|time:"H:i" }}</td>
+              <td class="fw-medium">{{ reserva.fecha|date:"d/m/Y" }}</td>
+              <td class="small text-muted">
+                {{ reserva.hora_inicio|time:"H:i" }} – {{ reserva.hora_fin|time:"H:i" }}
+              </td>
               <td class="text-center">{{ reserva.numero_personas }}</td>
               <td class="text-center">
-                {% include 'reservations/_badge_reserva.html' with estado=reserva.estado label=reserva.get_estado_display %}
-              </td>
-              <td class="text-center">
                 {% if reserva.estado == 'pendiente' %}
-                <form method="POST" action="{% url 'reservations:confirmar_reserva' reserva.pk %}"
-                      style="display:inline;">
+                  <span class="badge-estado estado-pendiente">Pendiente</span>
+                {% elif reserva.estado == 'confirmada' %}
+                  <span class="badge-estado estado-listo">Confirmada</span>
+                {% elif reserva.estado == 'cancelada' %}
+                  <span class="badge-estado estado-cancelado">Cancelada</span>
+                {% elif reserva.estado == 'completada' %}
+                  <span class="badge-estado estado-entregado">Completada</span>
+                {% endif %}
+              </td>
+              <td class="text-center pe-4">
+                {% if reserva.estado == 'pendiente' %}
+                <form method="post"
+                      action="{% url 'reservations:confirmar_reserva' reserva.pk %}"
+                      data-no-spinner>
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-success btn-sm"
-                          title="Confirmar reserva">
+                  <button type="submit" class="btn btn-sm btn-outline-success" title="Confirmar reserva">
                     <i class="bi bi-check-circle me-1"></i>Confirmar
                   </button>
                 </form>
                 {% else %}
-                <span class="text-muted small">—</span>
+                  <span class="text-muted small">—</span>
                 {% endif %}
               </td>
             </tr>
@@ -89,13 +122,56 @@
     </div>
   </div>
 
+  <!-- Paginación -->
+  {% if page_obj and page_obj.has_other_pages %}
+  <nav aria-label="Paginación de reservas">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">{{ num }}</span>
+        </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
   {% else %}
-  <div class="text-center py-5 text-muted">
-    <i class="bi bi-calendar-x display-1"></i>
-    <p class="mt-3 fs-5">No se encontraron reservas con los filtros aplicados.</p>
-    <a href="{% url 'reservations:lista_reservas' %}" class="btn btn-outline-secondary mt-2">
-      <i class="bi bi-x-circle me-1"></i>Limpiar filtros
-    </a>
+  <div class="row justify-content-center">
+    <div class="col-md-5 text-center py-5">
+      <i class="bi bi-calendar-x" style="font-size:4rem;color:var(--color-primary);opacity:.2;"></i>
+      <p class="mt-3 fs-5 fw-semibold">No se encontraron reservas.</p>
+      {% if request.GET %}
+      <a href="{% url 'reservations:lista_reservas' %}" class="btn btn-outline-secondary mt-2">
+        <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+      </a>
+      {% endif %}
+    </div>
   </div>
   {% endif %}
 
