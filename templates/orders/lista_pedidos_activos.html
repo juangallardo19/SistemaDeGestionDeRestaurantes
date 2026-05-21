@@ -1,141 +1,354 @@
 {% extends 'base.html' %}
 
-{% block title %}Pedidos activos — RestaurApp{% endblock %}
+{% block title %}Pedidos Activos — RestaurApp{% endblock %}
+
+{% block extra_css %}
+<style>
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+@media (max-width: 991px) {
+    .kanban-board { grid-template-columns: 1fr; }
+}
+
+.kanban-col {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+.kanban-col-header {
+    padding: .85rem 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.kanban-col-title {
+    font-weight: 700;
+    font-size: .82rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.kanban-col-count {
+    font-size: .72rem;
+    font-weight: 600;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+}
+
+/* Column color accents */
+.col-pendiente { border-top: 3px solid #E0A500; }
+.col-pendiente .kanban-col-title { color: #9A7000; }
+.col-pendiente .kanban-col-count { background: #FEF9E7; color: #9A7000; }
+
+.col-preparacion { border-top: 3px solid var(--color-primary); }
+.col-preparacion .kanban-col-title { color: var(--color-primary); }
+.col-preparacion .kanban-col-count { background: var(--color-primary-pale); color: var(--color-primary); }
+
+.col-listo { border-top: 3px solid #2E7D46; }
+.col-listo .kanban-col-title { color: #2E7D46; }
+.col-listo .kanban-col-count { background: #EAF5EC; color: #2E7D46; }
+
+.kanban-cards {
+    padding: .75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    min-height: 80px;
+}
+
+.order-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: .85rem 1rem;
+    transition: box-shadow 150ms;
+}
+.order-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.06); }
+
+.order-card.urgent {
+    border-color: #2E7D46;
+    background: #F5FAF6;
+    box-shadow: 0 0 0 2px rgba(46,125,70,.15);
+}
+
+.order-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: .5rem;
+}
+.order-id {
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--color-text);
+}
+.order-mesa {
+    font-size: .72rem;
+    font-weight: 600;
+    background: var(--color-cream-dark);
+    color: var(--color-text-muted);
+    padding: .15rem .55rem;
+    border-radius: 999px;
+}
+.order-mesa.has-mesa {
+    background: #EAF0F9;
+    color: #2F5F9A;
+}
+.order-client {
+    font-size: .8rem;
+    color: var(--color-text-muted);
+    margin-bottom: .45rem;
+}
+.order-client strong { color: var(--color-text); }
+.order-items {
+    font-size: .78rem;
+    color: var(--color-text-muted);
+    margin-bottom: .55rem;
+    line-height: 1.5;
+}
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .5rem;
+    padding-top: .5rem;
+    border-top: 1px solid var(--color-border);
+}
+.order-time {
+    font-size: .72rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+}
+.order-time.late { color: #C0392B; font-weight: 600; }
+
+.btn-order-action {
+    padding: .32rem .75rem;
+    font-size: .78rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: background 150ms, color 150ms;
+    white-space: nowrap;
+}
+.btn-preparar { background: #FEF0E3; color: var(--color-primary); }
+.btn-preparar:hover { background: var(--color-primary); color: #fff; }
+.btn-listo { background: var(--color-primary-pale); color: var(--color-primary); }
+.btn-listo:hover { background: var(--color-primary); color: #fff; }
+.btn-entregar { background: #EAF5EC; color: #2E7D46; }
+.btn-entregar:hover { background: #2E7D46; color: #fff; }
+
+.kanban-empty {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--color-text-muted);
+    font-size: .8rem;
+    opacity: .6;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-2 px-md-4">
 
-  <!-- Encabezado con auto-refresh countdown -->
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
     <div class="d-flex align-items-center gap-2">
-      <i class="bi bi-fire fs-4 text-warning"></i>
+      <i class="fa-solid fa-fire-burner fs-4" style="color: var(--color-primary);"></i>
       <h2 class="mb-0">Pedidos Activos</h2>
-      <span class="badge bg-secondary ms-1">{{ pedidos|length }}</span>
+      <span class="badge ms-1" style="background:var(--color-primary-pale);color:var(--color-primary);font-size:.78rem;">
+        {{ pedidos|length }} en curso
+      </span>
     </div>
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-2">
       <span class="text-muted small">
-        <i class="bi bi-arrow-clockwise me-1"></i>
+        <i class="fa-solid fa-rotate me-1"></i>
         Actualizando en <strong id="refreshCountdown">30</strong>s
       </span>
-      <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()" title="Actualizar ahora">
-        <i class="bi bi-arrow-clockwise"></i>
+      <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+        <i class="fa-solid fa-rotate"></i>
       </button>
+      <a href="{% url 'orders:historial_pedidos' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-clock-rotate-left me-1"></i>Historial
+      </a>
     </div>
   </div>
 
-  {% if pedidos %}
-  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="px-4 py-3">#</th>
-              <th>Cliente</th>
-              <th>Mesa</th>
-              <th>Ítems</th>
-              <th class="text-end">Total</th>
-              <th class="text-center">Tiempo</th>
-              <th class="text-center">Estado</th>
-              <th class="text-center pe-4">Acción rápida</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for pedido in pedidos %}
-            <tr>
-              <!-- # -->
-              <td class="px-4 fw-bold">#{{ pedido.pk }}</td>
+  <div class="kanban-board">
 
-              <!-- Cliente -->
-              <td>
-                <span class="fw-medium d-block lh-sm">
-                  {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}
-                </span>
-                {% if pedido.mesero %}
-                <small class="text-muted">
-                  <i class="bi bi-person-badge me-1"></i>{{ pedido.mesero.get_full_name|default:pedido.mesero.username }}
-                </small>
-                {% endif %}
-              </td>
-
-              <!-- Mesa -->
-              <td>
-                {% if pedido.mesa %}
-                  <span class="badge bg-light text-dark border">
-                    <i class="bi bi-table me-1"></i>Mesa {{ pedido.mesa.numero }}
-                  </span>
-                {% else %}
-                  <span class="text-muted small">—</span>
-                {% endif %}
-              </td>
-
-              <!-- Resumen ítems -->
-              <td>
-                <div class="small">
-                  {% for detalle in pedido.detalles.all %}
-                  <span class="d-block text-muted lh-sm">
-                    {{ detalle.cantidad }}× {{ detalle.plato.nombre }}
-                  </span>
-                  {% endfor %}
-                </div>
-              </td>
-
-              <!-- Total -->
-              <td class="text-end fw-semibold text-primary-warm">${{ pedido.total }}</td>
-
-              <!-- Tiempo transcurrido -->
-              <td class="text-center">
-                <span class="badge {% if pedido.estado == 'pendiente' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
-                  <i class="bi bi-clock me-1"></i>{{ pedido.fecha_creacion|timesince }}
-                </span>
-              </td>
-
-              <!-- Estado actual -->
-              <td class="text-center">
-                <span class="badge-estado estado-{{ pedido.estado }}">
-                  {{ pedido.get_estado_display }}
-                </span>
-              </td>
-
-              <!-- Acción rápida: cambio de estado directo -->
-              <td class="text-center pe-4">
-                <form method="post"
-                      action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}"
-                      class="d-flex align-items-center justify-content-center gap-1"
-                      data-no-spinner>
-                  {% csrf_token %}
-                  <select name="estado"
-                          class="form-select form-select-sm"
-                          style="width:130px;"
-                          aria-label="Cambiar estado del pedido {{ pedido.pk }}">
-                    {% for value, label in pedido.ESTADO_CHOICES %}
-                    <option value="{{ value }}"
-                      {% if pedido.estado == value %}selected{% endif %}>
-                      {{ label }}
-                    </option>
-                    {% endfor %}
-                  </select>
-                  <button type="submit"
-                          class="btn btn-sm btn-primary-custom"
-                          title="Aplicar cambio">
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                </form>
-              </td>
-            </tr>
+    <!-- Pendientes -->
+    <div class="kanban-col col-pendiente">
+      <div class="kanban-col-header">
+        <span class="kanban-col-title"><i class="fa-regular fa-clock me-2"></i>Pendientes</span>
+        <span class="kanban-col-count">{{ pendientes|length }}</span>
+      </div>
+      <div class="kanban-cards">
+        {% for pedido in pendientes %}
+        <div class="order-card">
+          <div class="order-card-top">
+            <span class="order-id">#{{ pedido.pk }}</span>
+            {% if pedido.mesa %}
+            <span class="order-mesa has-mesa">
+              <i class="fa-solid fa-chair me-1"></i>Mesa {{ pedido.mesa.numero }}
+            </span>
+            {% else %}
+            <span class="order-mesa">Sin mesa</span>
+            {% endif %}
+          </div>
+          <div class="order-client">
+            <strong>{{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</strong>
+            {% if pedido.mesero %}
+            · <span>{{ pedido.mesero.get_full_name|default:pedido.mesero.username }}</span>
+            {% endif %}
+          </div>
+          <div class="order-items">
+            {% for detalle in pedido.detalles.all %}
+            <span class="d-block">{{ detalle.cantidad }}× {{ detalle.plato.nombre }}</span>
             {% endfor %}
-          </tbody>
-        </table>
+          </div>
+          <div class="order-footer">
+            <span class="order-time">
+              <i class="fa-regular fa-clock"></i>{{ pedido.fecha_creacion|timesince }}
+            </span>
+            <form method="post" action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}" data-no-spinner>
+              {% csrf_token %}
+              <input type="hidden" name="estado" value="en_preparacion">
+              <input type="hidden" name="next" value="{% url 'orders:list' %}">
+              <button type="submit" class="btn-order-action btn-preparar">
+                <i class="fa-solid fa-fire me-1"></i>Preparar
+              </button>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <div class="kanban-empty">
+          <i class="fa-solid fa-check"></i><br>Sin pendientes
+        </div>
+        {% endfor %}
       </div>
     </div>
+
+    <!-- En preparación -->
+    <div class="kanban-col col-preparacion">
+      <div class="kanban-col-header">
+        <span class="kanban-col-title"><i class="fa-solid fa-fire me-2"></i>En preparación</span>
+        <span class="kanban-col-count">{{ en_preparacion|length }}</span>
+      </div>
+      <div class="kanban-cards">
+        {% for pedido in en_preparacion %}
+        <div class="order-card">
+          <div class="order-card-top">
+            <span class="order-id">#{{ pedido.pk }}</span>
+            {% if pedido.mesa %}
+            <span class="order-mesa has-mesa">
+              <i class="fa-solid fa-chair me-1"></i>Mesa {{ pedido.mesa.numero }}
+            </span>
+            {% else %}
+            <span class="order-mesa">Sin mesa</span>
+            {% endif %}
+          </div>
+          <div class="order-client">
+            <strong>{{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</strong>
+            {% if pedido.mesero %}
+            · <span>{{ pedido.mesero.get_full_name|default:pedido.mesero.username }}</span>
+            {% endif %}
+          </div>
+          <div class="order-items">
+            {% for detalle in pedido.detalles.all %}
+            <span class="d-block">{{ detalle.cantidad }}× {{ detalle.plato.nombre }}</span>
+            {% endfor %}
+          </div>
+          <div class="order-footer">
+            <span class="order-time">
+              <i class="fa-regular fa-clock"></i>{{ pedido.fecha_creacion|timesince }}
+            </span>
+            <form method="post" action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}" data-no-spinner>
+              {% csrf_token %}
+              <input type="hidden" name="estado" value="listo">
+              <input type="hidden" name="next" value="{% url 'orders:list' %}">
+              <button type="submit" class="btn-order-action btn-listo">
+                <i class="fa-solid fa-check me-1"></i>Listo
+              </button>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <div class="kanban-empty">
+          <i class="fa-solid fa-utensils"></i><br>Nada en preparación
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Listos para entregar -->
+    <div class="kanban-col col-listo">
+      <div class="kanban-col-header">
+        <span class="kanban-col-title">
+          <i class="fa-solid fa-bell me-2"></i>Listos para entregar
+        </span>
+        <span class="kanban-col-count">{{ listos|length }}</span>
+      </div>
+      <div class="kanban-cards">
+        {% for pedido in listos %}
+        <div class="order-card urgent">
+          <div class="order-card-top">
+            <span class="order-id">#{{ pedido.pk }}</span>
+            {% if pedido.mesa %}
+            <span class="order-mesa has-mesa">
+              <i class="fa-solid fa-chair me-1"></i>Mesa {{ pedido.mesa.numero }}
+            </span>
+            {% else %}
+            <span class="order-mesa">Sin mesa</span>
+            {% endif %}
+          </div>
+          <div class="order-client">
+            <strong>{{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</strong>
+            {% if pedido.mesero %}
+            · <span>{{ pedido.mesero.get_full_name|default:pedido.mesero.username }}</span>
+            {% endif %}
+          </div>
+          <div class="order-items">
+            {% for detalle in pedido.detalles.all %}
+            <span class="d-block">{{ detalle.cantidad }}× {{ detalle.plato.nombre }}</span>
+            {% endfor %}
+          </div>
+          <div class="order-footer">
+            <span class="order-time">
+              <i class="fa-regular fa-clock"></i>{{ pedido.fecha_creacion|timesince }}
+            </span>
+            <form method="post" action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}" data-no-spinner>
+              {% csrf_token %}
+              <input type="hidden" name="estado" value="entregado">
+              <input type="hidden" name="next" value="{% url 'orders:list' %}">
+              <button type="submit" class="btn-order-action btn-entregar">
+                <i class="fa-solid fa-bag-shopping me-1"></i>Entregar
+              </button>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <div class="kanban-empty">
+          <i class="fa-solid fa-circle-check"></i><br>Sin pedidos listos
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
   </div>
 
-  {% else %}
-  <div class="row justify-content-center">
+  {% if not pedidos %}
+  <div class="row justify-content-center mt-4">
     <div class="col-md-5 text-center py-5">
-      <i class="bi bi-check-circle" style="font-size:4rem;color:#10B981;opacity:.3;"></i>
+      <i class="fa-solid fa-circle-check" style="font-size:4rem;color:#2E7D46;opacity:.25;"></i>
       <p class="mt-3 fs-5 fw-semibold">No hay pedidos activos en este momento.</p>
-      <p class="text-muted">Los nuevos pedidos aparecerán aquí automáticamente.</p>
+      <p class="text-muted small">Los nuevos pedidos aparecerán aquí automáticamente.</p>
     </div>
   </div>
   {% endif %}
@@ -145,18 +358,14 @@
 
 {% block extra_js %}
 <script>
-  (function () {
-    var seconds = 30;
-    var countdown = document.getElementById('refreshCountdown');
-
-    var timer = setInterval(function () {
-      seconds -= 1;
-      if (countdown) countdown.textContent = seconds;
-      if (seconds <= 0) {
-        clearInterval(timer);
-        location.reload();
-      }
-    }, 1000);
-  })();
+(function () {
+  var seconds = 30;
+  var countdown = document.getElementById('refreshCountdown');
+  var timer = setInterval(function () {
+    seconds -= 1;
+    if (countdown) countdown.textContent = seconds;
+    if (seconds <= 0) { clearInterval(timer); location.reload(); }
+  }, 1000);
+})();
 </script>
 {% endblock %}

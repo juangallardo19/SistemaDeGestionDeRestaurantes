@@ -10,6 +10,7 @@ urlpatterns = [
     path('carrito/agregar/<int:plato_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
     path('carrito/remover/<int:plato_id>/', views.remover_del_carrito, name='remover_del_carrito'),
     path('carrito/actualizar/<int:plato_id>/', views.actualizar_carrito, name='actualizar_carrito'),
+    path('carrito/json/', views.carrito_json, name='carrito_json'),
     path('carrito/confirmar/', views.crear_pedido, name='crear_pedido'),
     # Pedidos — 'list' es el nombre requerido por base.html y accounts/views.py (redirect mesero)
     path('activos/', views.lista_pedidos_activos, name='list'),

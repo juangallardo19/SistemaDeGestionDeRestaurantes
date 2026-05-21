@@ -1,5 +1,5 @@
-{% load static %}
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard — RestaurApp{% endblock %}
 
@@ -102,13 +102,13 @@
 <div class="container-fluid px-2 px-md-4">
 
   <!-- ── Encabezado ─────────────────────────────────────── -->
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
       <h2 class="mb-0">
         <i class="bi bi-speedometer2 me-2 text-primary-warm"></i>Dashboard
       </h2>
       <p class="text-muted small mb-0 mt-1">
-        <i class="bi bi-calendar3 me-1"></i>Resumen del día de hoy
+        <i class="bi bi-calendar3 me-1"></i>{{ rango_label }}
       </p>
     </div>
     <div class="text-end">
@@ -119,6 +119,16 @@
       </div>
       <div id="dashDate" class="text-muted small mt-1"></div>
     </div>
+  </div>
+
+  <!-- Filtros rápidos de rango -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    {% for key, label in rango_opciones %}
+    <a href="?rango={{ key }}"
+       class="btn btn-sm {% if rango == key %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
   </div>
 
   <!-- ══ Sección 1: KPI Cards ══════════════════════════════ -->
@@ -144,6 +154,11 @@
           <div>
             <p class="kpi-label mb-2">Ingresos hoy</p>
             <div class="kpi-value">${{ ingresos_hoy|default:"0" }}</div>
+            {% if ingresos_en_proceso %}
+            <p class="mb-0 mt-1" style="font-size:.72rem; color:var(--color-text-muted);">
+              +${{ ingresos_en_proceso }} en proceso
+            </p>
+            {% endif %}
           </div>
           <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
         </div>
@@ -299,73 +314,40 @@
     <p class="chart-section-title mb-3">
       <i class="bi bi-download me-1"></i>Exportar reportes
     </p>
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-sm-auto">
+        <label for="exportDesde" class="form-label small fw-semibold mb-1">Desde</label>
+        <input type="date" id="exportDesde" class="form-control form-control-sm" style="min-width:150px;">
+      </div>
+      <div class="col-sm-auto">
+        <label for="exportHasta" class="form-label small fw-semibold mb-1">Hasta</label>
+        <input type="date" id="exportHasta" class="form-control form-control-sm" style="min-width:150px;">
+      </div>
+    </div>
+    <div id="exportPanelError" class="text-danger small mb-2" hidden>
+      Seleccioná ambas fechas antes de descargar.
+    </div>
     <div class="d-flex flex-wrap gap-2">
       <button class="btn-export btn-export-pdf"
-              data-export-url="{% url 'dashboard:export_pedidos_pdf' %}"
-              data-export-label="Pedidos PDF">
+              data-export-url="{% url 'dashboard:export_pedidos_pdf' %}">
         <i class="bi bi-file-earmark-pdf"></i>Pedidos PDF
       </button>
       <button class="btn-export btn-export-excel"
-              data-export-url="{% url 'dashboard:export_pedidos_excel' %}"
-              data-export-label="Pedidos Excel">
+              data-export-url="{% url 'dashboard:export_pedidos_excel' %}">
         <i class="bi bi-file-earmark-excel"></i>Pedidos Excel
       </button>
       <button class="btn-export btn-export-pdf"
-              data-export-url="{% url 'dashboard:export_inventario_pdf' %}"
-              data-export-label="Inventario PDF">
+              data-export-url="{% url 'dashboard:export_inventario_pdf' %}">
         <i class="bi bi-file-earmark-pdf"></i>Inventario PDF
       </button>
       <button class="btn-export btn-export-excel"
-              data-export-url="{% url 'dashboard:export_inventario_excel' %}"
-              data-export-label="Inventario Excel">
+              data-export-url="{% url 'dashboard:export_inventario_excel' %}">
         <i class="bi bi-file-earmark-excel"></i>Inventario Excel
       </button>
     </div>
   </div>
 
 </div><!-- /container -->
-
-<!-- ── Modal de exportación ──────────────────────────────── -->
-<div class="modal fade" id="exportModal" tabindex="-1"
-     aria-labelledby="exportModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-3 border-0 shadow">
-      <div class="modal-header border-bottom px-4 py-3">
-        <h5 class="modal-title fw-semibold" id="exportModalLabel">
-          <i class="bi bi-download me-2 text-primary-warm"></i>
-          <span id="exportModalTitle">Exportar reporte</span>
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body px-4 py-4">
-        <p class="text-muted small mb-4">
-          Seleccioná el rango de fechas para incluir en el reporte.
-        </p>
-        <div class="row g-3">
-          <div class="col-6">
-            <label for="exportFechaDesde" class="form-label fw-semibold small">Desde</label>
-            <input type="date" id="exportFechaDesde" class="form-control">
-          </div>
-          <div class="col-6">
-            <label for="exportFechaHasta" class="form-label fw-semibold small">Hasta</label>
-            <input type="date" id="exportFechaHasta" class="form-control">
-          </div>
-        </div>
-        <div id="exportError" class="text-danger small mt-3" hidden>
-          Seleccioná ambas fechas antes de continuar.
-        </div>
-      </div>
-      <div class="modal-footer border-top px-4 py-3 gap-2">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-          Cancelar
-        </button>
-        <button type="button" class="btn btn-primary-custom" id="exportConfirmarBtn">
-          <i class="bi bi-download me-1"></i>Descargar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -392,9 +374,10 @@
 
 <!-- Configuración de URLs para dashboard.js -->
 <script>
+  const DASH_RANGO = "{{ rango }}";
   const DASH_CONFIG = {
     urls: {
-      platos:              "{% url 'dashboard:api_platos' %}",
+      platos:              "{% url 'dashboard:api_platos' %}?rango={{ rango }}",
       ingresos:            "{% url 'dashboard:api_ingresos' %}",
       estados:             "{% url 'dashboard:api_estados' %}",
       reservas:            "{% url 'dashboard:api_reservas' %}",

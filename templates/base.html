@@ -24,7 +24,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
@@ -39,18 +39,21 @@
 {% include 'partials/messages.html' %}
 
 <main class="page-content" id="main-content">
-    <div class="container-fluid py-4">
+    <div class="container-fluid py-5">
         {% block content %}{% endblock %}
     </div>
 </main>
 
 <footer class="site-footer">
-    <div class="container text-center">
-        <span class="footer-brand">
-            <i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>RestaurApp
-        </span>
-        <p class="footer-copy mt-1 mb-0">
-            &copy; {% now "Y" %} RestaurApp &mdash; Sistema de Gestión de Restaurante
+    <div class="footer-inner">
+        <div class="footer-brand-area">
+            <span class="footer-brand">
+                <i class="fa-solid fa-utensils" aria-hidden="true"></i>RestaurApp
+            </span>
+            <p class="footer-tagline">Sistema de Gestión de Restaurante</p>
+        </div>
+        <p class="footer-copy">
+            &copy; {% now "Y" %} RestaurApp &mdash; Todos los derechos reservados
         </p>
     </div>
 </footer>

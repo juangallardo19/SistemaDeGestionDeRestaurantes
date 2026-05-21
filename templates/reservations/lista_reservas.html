@@ -106,8 +106,20 @@
                       action="{% url 'reservations:confirmar_reserva' reserva.pk %}"
                       data-no-spinner>
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-outline-success" title="Confirmar reserva">
+                  <button type="submit" class="btn btn-sm btn-outline-success" title="Confirmar y notificar cliente">
                     <i class="bi bi-check-circle me-1"></i>Confirmar
+                  </button>
+                </form>
+                {% elif reserva.estado == 'confirmada' %}
+                <form method="post"
+                      action="{% url 'reservations:completar_reserva' reserva.pk %}"
+                      data-no-spinner>
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm"
+                          style="border:1px solid var(--color-primary);color:var(--color-primary);"
+                          title="Marcar como completada (mesa atendida)">
+                    <i class="bi bi-check2-all me-1"></i>Completar
                   </button>
                 </form>
                 {% else %}

@@ -1,6 +1,6 @@
 /* =========================================================
    RestaurApp — Custom Styles
-   Paleta editorial cálida: naranja, crema, marrón
+   Minimalismo editorial: base neutra cálida, acento naranja
    ========================================================= */
 
 /* ---------------------------------------------------------
@@ -10,41 +10,41 @@
     /* Marca */
     --color-primary:       #D4700A;
     --color-primary-hover: #B85D08;
-    --color-primary-pale:  rgba(212, 112, 10, 0.12);
+    --color-primary-pale:  rgba(212, 112, 10, 0.10);
 
-    /* Paleta cálida */
-    --color-cream:         #FAF3E8;
-    --color-cream-dark:    #F0E6D3;
-    --color-brown:         #4A2F1A;
-    --color-brown-deep:    #2C1A0E;
-    --color-brown-light:   #7A5230;
+    /* Paleta neutra cálida (mínima) */
+    --color-cream:         #F7F6F3;
+    --color-cream-dark:    #EEECEA;
+    --color-brown:         #3D2B1A;
+    --color-brown-deep:    #111111;
+    --color-brown-light:   #6B5444;
 
     /* Semánticos (modo claro) */
-    --color-bg:            #FAF3E8;
+    --color-bg:            #F7F6F3;
     --color-surface:       #FFFFFF;
-    --color-text:          #1A0F08;
-    --color-text-muted:    #6B5444;
-    --color-border:        #DDD0C0;
+    --color-text:          #111111;
+    --color-text-muted:    #787774;
+    --color-border:        #E8E5DF;
 
     /* Navbar */
-    --navbar-bg:           #2C1A0E;
-    --navbar-text:         rgba(255, 255, 255, 0.88);
+    --navbar-bg:           #111111;
+    --navbar-text:         rgba(255, 255, 255, 0.80);
     --navbar-text-hover:   #FFFFFF;
-    --navbar-accent:       rgba(212, 112, 10, 0.6);
+    --navbar-accent:       rgba(255, 255, 255, 0.07);
 
     /* Footer */
-    --footer-bg:           #2C1A0E;
-    --footer-text:         rgba(255, 255, 255, 0.6);
+    --footer-bg:           #111111;
+    --footer-text:         rgba(255, 255, 255, 0.5);
 
     /* Tipografía */
     --font-display:        'Playfair Display', Georgia, serif;
-    --font-body:           'DM Sans', system-ui, sans-serif;
+    --font-body:           'DM Sans', 'Helvetica Neue', system-ui, sans-serif;
 
     /* Movimiento */
     --ease-out:            cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out:         cubic-bezier(0.77, 0, 0.175, 1);
-    --duration-fast:       160ms;
-    --duration-base:       260ms;
+    --duration-fast:       150ms;
+    --duration-base:       240ms;
 
     /* Radios */
     --radius-sm:           6px;
@@ -54,19 +54,49 @@
 }
 
 /* ---------------------------------------------------------
+   1b. Bootstrap — override de variables de color
+        Esto elimina el azul por defecto de Bootstrap
+   --------------------------------------------------------- */
+:root {
+    --bs-primary:                   #D4700A;
+    --bs-primary-rgb:               212, 112, 10;
+    --bs-link-color:                #D4700A;
+    --bs-link-color-rgb:            212, 112, 10;
+    --bs-link-hover-color:          #B85D08;
+    --bs-link-hover-color-rgb:      184, 93, 8;
+    --bs-nav-pills-link-active-bg:  #D4700A;
+    --bs-border-color:              #E8E5DF;
+    --bs-border-color-translucent:  rgba(0, 0, 0, 0.07);
+    --bs-body-font-family:          'DM Sans', 'Helvetica Neue', system-ui, sans-serif;
+    --bs-body-color:                #111111;
+    --bs-body-bg:                   #F7F6F3;
+    --bs-secondary-color:           #787774;
+    --bs-border-radius:             8px;
+    --bs-border-radius-sm:          6px;
+    --bs-border-radius-lg:          12px;
+}
+
+/* ---------------------------------------------------------
    2. Dark mode — complementa Bootstrap 5.3
    --------------------------------------------------------- */
 [data-bs-theme="dark"] {
-    --color-bg:            #180D06;
-    --color-surface:       #2C1A0E;
-    --color-text:          #F5EDE0;
-    --color-text-muted:    #B8946A;
-    --color-border:        #4A3020;
-    --color-cream:         #2C1A0E;
-    --color-cream-dark:    #3A2215;
-    --navbar-bg:           #0E0805;
-    --navbar-accent:       rgba(212, 112, 10, 0.35);
-    --footer-bg:           #0E0805;
+    --color-bg:            #141210;
+    --color-surface:       #1E1A16;
+    --color-text:          #F0EBE0;
+    --color-text-muted:    #9E9590;
+    --color-border:        #302820;
+    --color-cream:         #1E1A16;
+    --color-cream-dark:    #282018;
+    --navbar-bg:           #0A0908;
+    --navbar-accent:       rgba(255, 255, 255, 0.05);
+    --footer-bg:           #0A0908;
+
+    /* Bootstrap dark overrides */
+    --bs-primary:          #E07C1A;
+    --bs-link-color:       #E07C1A;
+    --bs-border-color:     #302820;
+    --bs-body-color:       #F0EBE0;
+    --bs-body-bg:          #141210;
 }
 
 [data-bs-theme="dark"] .card {
@@ -101,22 +131,48 @@
    3. Base & tipografía
    --------------------------------------------------------- */
 body {
-    font-family:    var(--font-body);
+    font-family:      var(--font-body);
     background-color: var(--color-bg);
-    color:          var(--color-text);
-    min-height:     100dvh;
-    display:        flex;
-    flex-direction: column;
+    color:            var(--color-text);
+    min-height:       100dvh;
+    display:          flex;
+    flex-direction:   column;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3 {
-    font-family: var(--font-display);
-    font-weight: 700;
+/* Toda la jerarquía tipográfica usa DM Sans — limpio y amigable */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+h1 { font-size: 1.75rem; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+
+/* Clase explícita para usar la serif editorial en contextos decorativos */
+.display-serif {
+    font-family:    var(--font-display);
+    font-weight:    700;
+    letter-spacing: -0.02em;
+    line-height:    1.15;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
 }
 
 main.page-content {
     flex: 1;
-    animation: fadeInUp 0.38s var(--ease-out) both;
+    animation: fadeInUp 0.35s var(--ease-out) both;
 }
 
 /* ---------------------------------------------------------
@@ -144,8 +200,8 @@ main.page-content {
    --------------------------------------------------------- */
 .site-navbar {
     background-color: var(--navbar-bg);
-    border-bottom:    1px solid var(--navbar-accent);
-    padding:          0.6rem 1rem;
+    border-bottom:    1px solid rgba(255, 255, 255, 0.06);
+    padding:          0.95rem 1.5rem;
     position:         sticky;
     top:              0;
     z-index:          1030;
@@ -154,7 +210,7 @@ main.page-content {
 .site-brand {
     display:     flex;
     align-items: center;
-    gap:         0.55rem;
+    gap:         0.65rem;
     text-decoration: none;
 }
 
@@ -162,8 +218,8 @@ main.page-content {
     display:         flex;
     align-items:     center;
     justify-content: center;
-    width:           34px;
-    height:          34px;
+    width:           36px;
+    height:          36px;
     background:      var(--color-primary);
     color:           #fff;
     border-radius:   var(--radius-sm);
@@ -174,35 +230,60 @@ main.page-content {
 }
 
 .site-brand:hover .brand-icon {
-    transform:  scale(1.07);
-    box-shadow: 0 4px 12px rgba(212, 112, 10, 0.4);
+    transform:  scale(1.06);
+    box-shadow: 0 4px 14px rgba(212, 112, 10, 0.45);
 }
 
 .brand-name {
-    font-family:    var(--font-display);
-    font-size:      1.18rem;
+    font-family:    var(--font-body);
+    font-size:      1.15rem;
     font-weight:    700;
     color:          #FFFFFF;
-    letter-spacing: 0.01em;
+    letter-spacing: 0em;
 }
 
 /* Links del nav */
 .nav-link-custom {
     color:          var(--navbar-text) !important;
-    font-size:      0.875rem;
+    font-size:      0.85rem;
     font-weight:    500;
-    padding:        0.45rem 0.75rem !important;
+    padding:        0.5rem 0.85rem !important;
     border-radius:  var(--radius-sm);
+    letter-spacing: 0.01em;
     transition:     color var(--duration-fast) var(--ease-out),
                     background-color var(--duration-fast) var(--ease-out);
-    position:       relative;
 }
 
 .nav-link-custom:hover,
 .nav-link-custom:focus,
 .nav-link-custom.active {
     color:            var(--navbar-text-hover) !important;
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Separador vertical en navbar */
+.nav-divider {
+    width:      1px;
+    height:     20px;
+    background: rgba(255, 255, 255, 0.12);
+    margin:     0 0.25rem;
+    flex-shrink: 0;
+}
+
+/* Centrado de los links del nav en desktop */
+@media (min-width: 992px) {
+    .site-navbar .container-fluid {
+        position: relative;
+    }
+    .navbar-nav.navbar-nav-center {
+        position:    absolute;
+        left:        50%;
+        top:         50%;
+        transform:   translate(-50%, -50%);
+        flex-wrap:   nowrap;
+        gap:         0.15rem;
+        margin:      0 !important;
+    }
 }
 
 /* Toggle de tema */
@@ -388,7 +469,7 @@ main.page-content {
    --------------------------------------------------------- */
 .messages-container {
     position:   fixed;
-    top:        72px;
+    top:        80px;
     right:      1.25rem;
     z-index:    1060;
     display:    flex;
@@ -421,6 +502,85 @@ main.page-content {
 .alert-icon {
     flex-shrink: 0;
     font-size:   1rem;
+}
+
+/* ---------------------------------------------------------
+   6b. Componentes globales compartidos
+   --------------------------------------------------------- */
+
+/* Badge de categoría (usada en menu list y detalle) */
+.plato-cat-badge {
+    display:        inline-block;
+    padding:        0.15rem 0.65rem;
+    background:     var(--color-primary-pale);
+    color:          var(--color-primary);
+    border-radius:  999px;
+    font-size:      0.75rem;
+    font-weight:    600;
+    letter-spacing: 0.02em;
+}
+
+/* Bootstrap .card — sobreescribir para seguir la paleta */
+.card {
+    border:        1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background:    var(--color-surface);
+    box-shadow:    none;
+}
+
+.card-header {
+    background:   var(--color-cream-dark);
+    border-bottom: 1px solid var(--color-border);
+    font-weight:  600;
+}
+
+/* Bootstrap nav-pills — asegurar que el active use naranja */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--color-primary);
+    color: #fff;
+}
+.nav-pills .nav-link {
+    color: var(--color-text-muted);
+}
+.nav-pills .nav-link:hover {
+    color: var(--color-primary);
+    background-color: var(--color-primary-pale);
+}
+
+/* Bootstrap badges */
+.badge.bg-primary { background-color: var(--color-primary) !important; }
+.badge.bg-secondary { background-color: var(--color-text-muted) !important; }
+
+/* Bootstrap form controls */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(212, 112, 10, 0.12);
+}
+
+/* Bootstrap btn-primary */
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color:     var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--color-primary-hover);
+    border-color:     var(--color-primary-hover);
+}
+
+/* Bootstrap btn-outline-primary */
+.btn-outline-primary {
+    color:        var(--color-primary);
+    border-color: var(--color-primary);
+}
+.btn-outline-primary:hover {
+    background-color: var(--color-primary);
+    border-color:     var(--color-primary);
+    color: #fff;
 }
 
 /* ---------------------------------------------------------
@@ -760,21 +920,53 @@ main.page-content {
    --------------------------------------------------------- */
 .site-footer {
     background:  var(--footer-bg);
-    padding:     1.5rem 1rem;
+    padding:     3.5rem 1.5rem;
     margin-top:  auto;
+    border-top:  1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-inner {
+    max-width:   960px;
+    margin:      0 auto;
+    display:     flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap:   wrap;
+    gap:         1.5rem;
+}
+
+.footer-brand-area {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.3rem;
 }
 
 .footer-brand {
-    font-family: var(--font-display);
-    font-size:   1.1rem;
-    font-weight: 700;
-    color:       var(--color-primary);
-    display:     inline-block;
+    font-family:  var(--font-body);
+    font-size:    1rem;
+    font-weight:  700;
+    color:        var(--color-primary);
+    display:      inline-flex;
+    align-items:  center;
+    gap:          0.4rem;
+}
+
+.footer-tagline {
+    color:     var(--footer-text);
+    font-size: 0.8rem;
+    margin:    0;
 }
 
 .footer-copy {
     color:     var(--footer-text);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    margin:    0;
+    text-align: right;
+}
+
+@media (max-width: 575px) {
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .footer-copy  { text-align: left; }
 }
 
 /* ---------------------------------------------------------

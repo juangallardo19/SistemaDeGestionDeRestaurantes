@@ -1,6 +1,7 @@
 from django import forms
 
 from accounts.models import CustomUser
+from reservations.models import Mesa
 
 from .models import Pedido
 
@@ -25,9 +26,18 @@ class AgregarAlCarritoForm(forms.Form):
 
 
 class PedidoForm(forms.ModelForm):
+    mesa = forms.ModelChoiceField(
+        queryset=Mesa.objects.filter(activa=True),
+        required=False,
+        empty_label='— Sin mesa asignada —',
+        label='Mesa',
+        help_text='Indicá en qué mesa estás sentado para que el mesero pueda llevar tu pedido.',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
     class Meta:
         model = Pedido
-        fields = ['notas', 'metodo_pago']
+        fields = ['mesa', 'notas', 'metodo_pago']
         widgets = {
             'notas': forms.Textarea(attrs={
                 'class': 'form-control',

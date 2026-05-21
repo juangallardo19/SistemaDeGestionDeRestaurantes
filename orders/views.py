@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count, Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import admin_required, mesero_required
@@ -55,6 +56,28 @@ def _descontar_ingredientes(pedido, responsable):
 
 # ── Carrito ───────────────────────────────────────────────────────────────────
 
+def _is_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def _carrito_payload(request):
+    carrito = Carrito(request)
+    items = []
+    for item in carrito:
+        items.append({
+            'plato_id': item['plato'].pk,
+            'nombre':   item['plato'].nombre,
+            'cantidad': item['cantidad'],
+            'precio':   str(item['precio']),
+            'subtotal': str(item['subtotal']),
+        })
+    return {
+        'items': items,
+        'total': str(carrito.get_total()),
+        'count': len(carrito),
+    }
+
+
 @login_required
 def ver_carrito(request):
     carrito = Carrito(request)
@@ -62,6 +85,11 @@ def ver_carrito(request):
         'carrito': carrito,
         'total': carrito.get_total(),
     })
+
+
+@login_required
+def carrito_json(request):
+    return JsonResponse(_carrito_payload(request))
 
 
 @login_required
@@ -74,10 +102,16 @@ def agregar_al_carrito(request, plato_id):
             cantidad = form.cleaned_data['cantidad']
             if form.cleaned_data.get('actualizar'):
                 carrito.actualizar(plato.pk, cantidad)
-                messages.success(request, 'Cantidad actualizada en el carrito.')
             else:
                 carrito.agregar(plato, cantidad)
-                messages.success(request, f'"{plato.nombre}" agregado al carrito.')
+            if _is_ajax(request):
+                return JsonResponse(_carrito_payload(request))
+            messages.success(request, f'"{plato.nombre}" agregado al carrito.')
+    if _is_ajax(request):
+        return JsonResponse(_carrito_payload(request))
+    next_url = request.POST.get('next', '')
+    if next_url and next_url.startswith('/'):
+        return redirect(next_url)
     return redirect('orders:cart')
 
 
@@ -85,7 +119,11 @@ def agregar_al_carrito(request, plato_id):
 def remover_del_carrito(request, plato_id):
     if request.method == 'POST':
         Carrito(request).remover(plato_id)
+        if _is_ajax(request):
+            return JsonResponse(_carrito_payload(request))
         messages.info(request, 'Plato removido del carrito.')
+    if _is_ajax(request):
+        return JsonResponse(_carrito_payload(request))
     return redirect('orders:cart')
 
 
@@ -95,7 +133,11 @@ def actualizar_carrito(request, plato_id):
         form = AgregarAlCarritoForm(request.POST)
         if form.is_valid():
             Carrito(request).actualizar(plato_id, form.cleaned_data['cantidad'])
+            if _is_ajax(request):
+                return JsonResponse(_carrito_payload(request))
             messages.success(request, 'Carrito actualizado.')
+    if _is_ajax(request):
+        return JsonResponse(_carrito_payload(request))
     return redirect('orders:cart')
 
 
@@ -116,6 +158,8 @@ def crear_pedido(request):
                 with transaction.atomic():
                     pedido = Pedido.objects.create(
                         cliente=request.user,
+                        mesa=form.cleaned_data.get('mesa'),
+                        mesero=request.user if request.user.is_mesero else None,
                         notas=form.cleaned_data['notas'],
                         metodo_pago=form.cleaned_data['metodo_pago'],
                     )
@@ -143,10 +187,19 @@ def crear_pedido(request):
     else:
         form = PedidoForm()
 
+    mesas_ocupadas_ids = list(
+        Pedido.objects
+        .filter(estado__in=['pendiente', 'en_preparacion', 'listo'])
+        .exclude(mesa__isnull=True)
+        .values_list('mesa_id', flat=True)
+        .distinct()
+    )
+
     return render(request, 'orders/crear_pedido.html', {
         'form': form,
         'carrito': carrito,
         'total': carrito.get_total(),
+        'mesas_ocupadas_ids': mesas_ocupadas_ids,
     })
 
 
@@ -203,11 +256,29 @@ def detalle_pedido(request, pk):
 
 @mesero_required
 def lista_pedidos_activos(request):
-    pedidos = Pedido.objects.filter(
-        estado__in=['pendiente', 'en_preparacion'],
-    ).select_related('cliente', 'mesero', 'mesa').prefetch_related('detalles__plato')
+    qs = Pedido.objects.filter(
+        estado__in=['pendiente', 'en_preparacion', 'listo'],
+    ).select_related('cliente', 'mesero', 'mesa').prefetch_related('detalles__plato').order_by('fecha_creacion')
 
-    return render(request, 'orders/lista_pedidos_activos.html', {'pedidos': pedidos})
+    listos = [p for p in qs if p.estado == 'listo']
+    en_preparacion = [p for p in qs if p.estado == 'en_preparacion']
+    pendientes = [p for p in qs if p.estado == 'pendiente']
+
+    return render(request, 'orders/lista_pedidos_activos.html', {
+        'pedidos': qs,
+        'listos': listos,
+        'en_preparacion': en_preparacion,
+        'pendientes': pendientes,
+    })
+
+
+_TRANSICIONES_VALIDAS = {
+    'pendiente':      ['en_preparacion', 'cancelado'],
+    'en_preparacion': ['listo', 'cancelado'],
+    'listo':          ['entregado'],
+    'entregado':      [],
+    'cancelado':      [],
+}
 
 
 @mesero_required
@@ -215,23 +286,28 @@ def cambiar_estado_pedido(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
 
     if request.method == 'POST':
-        form = CambiarEstadoPedidoForm(request.POST, instance=pedido)
-        if form.is_valid():
+        nuevo_estado = request.POST.get('estado', '')
+        permitidos = _TRANSICIONES_VALIDAS.get(pedido.estado, [])
+        if nuevo_estado not in permitidos:
+            messages.error(
+                request,
+                f'No se puede cambiar el pedido #{pk} de '
+                f'"{pedido.get_estado_display()}" a ese estado.',
+            )
+        else:
             estado_anterior = pedido.estado
-            form.save()
+            pedido.estado = nuevo_estado
+            pedido.save(update_fields=['estado', 'fecha_actualizacion'])
             send_cambio_estado_pedido(pedido, estado_anterior)
             messages.success(
                 request,
-                f'Estado del pedido #{pedido.pk} cambiado a "{pedido.get_estado_display()}".',
+                f'Pedido #{pk} → {pedido.get_estado_display()}.',
             )
-            return redirect('orders:detalle_pedido', pk=pk)
-    else:
-        form = CambiarEstadoPedidoForm(instance=pedido)
+        next_url = request.POST.get('next', '')
+        return redirect(next_url if next_url and next_url.startswith('/') else 'orders:list')
 
-    return render(request, 'orders/cambiar_estado.html', {
-        'form': form,
-        'pedido': pedido,
-    })
+    form = CambiarEstadoPedidoForm(instance=pedido)
+    return render(request, 'orders/cambiar_estado.html', {'form': form, 'pedido': pedido})
 
 
 @admin_required

@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from accounts.decorators import mesero_required
+from accounts.decorators import admin_required, mesero_required
+from orders.carrito import Carrito
 
 from .forms import CategoriaForm, IngredienteForm, PlatoForm
 from .models import Categoria, Ingrediente, Plato
@@ -17,7 +18,7 @@ def lista_categorias(request):
     return render(request, 'menu/lista_categorias.html', {'categorias': categorias})
 
 
-@mesero_required
+@admin_required
 def crear_categoria(request):
     form = CategoriaForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -27,7 +28,7 @@ def crear_categoria(request):
     return render(request, 'menu/form_categoria.html', {'form': form, 'titulo': 'Crear Categoría'})
 
 
-@mesero_required
+@admin_required
 def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     form = CategoriaForm(request.POST or None, request.FILES or None, instance=categoria)
@@ -42,7 +43,7 @@ def editar_categoria(request, pk):
     })
 
 
-@mesero_required
+@admin_required
 def eliminar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     if request.method == 'POST':
@@ -76,6 +77,7 @@ def lista_platos(request):
         'categorias': categorias,
         'categoria_id': categoria_id,
         'query': '',
+        'carrito': Carrito(request),
     })
 
 
@@ -85,7 +87,7 @@ def detalle_plato(request, pk):
     return render(request, 'menu/detalle_plato.html', {'plato': plato})
 
 
-@mesero_required
+@admin_required
 def crear_plato(request):
     form = PlatoForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -95,7 +97,7 @@ def crear_plato(request):
     return render(request, 'menu/form_plato.html', {'form': form, 'titulo': 'Crear Plato'})
 
 
-@mesero_required
+@admin_required
 def editar_plato(request, pk):
     plato = get_object_or_404(Plato, pk=pk)
     form = PlatoForm(request.POST or None, request.FILES or None, instance=plato)
@@ -110,7 +112,7 @@ def editar_plato(request, pk):
     })
 
 
-@mesero_required
+@admin_required
 def eliminar_plato(request, pk):
     plato = get_object_or_404(Plato, pk=pk)
     if request.method == 'POST':
@@ -133,7 +135,7 @@ def lista_ingredientes(request):
     return render(request, 'menu/lista_ingredientes.html', {'ingredientes': ingredientes})
 
 
-@mesero_required
+@admin_required
 def crear_ingrediente(request):
     form = IngredienteForm(request.POST or None)
     if form.is_valid():
@@ -143,7 +145,7 @@ def crear_ingrediente(request):
     return render(request, 'menu/form_ingrediente.html', {'form': form, 'titulo': 'Crear Ingrediente'})
 
 
-@mesero_required
+@admin_required
 def editar_ingrediente(request, pk):
     ingrediente = get_object_or_404(Ingrediente, pk=pk)
     form = IngredienteForm(request.POST or None, instance=ingrediente)
@@ -158,7 +160,7 @@ def editar_ingrediente(request, pk):
     })
 
 
-@mesero_required
+@admin_required
 def eliminar_ingrediente(request, pk):
     ingrediente = get_object_or_404(Ingrediente, pk=pk)
     if request.method == 'POST':
@@ -196,4 +198,5 @@ def buscar_platos(request):
         'categorias': categorias,
         'categoria_id': categoria_id,
         'query': query,
+        'carrito': Carrito(request),
     })

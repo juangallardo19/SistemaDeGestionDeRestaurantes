@@ -62,15 +62,54 @@ def _parse_fechas(request):
 
 # ── Dashboard principal ───────────────────────────────────────────────────────
 
+_RANGO_LABELS = {
+    'hoy':    'Hoy',
+    'semana': 'Últimos 7 días',
+    'mes':    'Este mes',
+    'year':   'Este año',
+}
+
+
+def _rango_inicio(rango, today):
+    if rango == 'semana':
+        return today - timedelta(days=6)
+    if rango == 'mes':
+        return today.replace(day=1)
+    if rango == 'year':
+        return today.replace(month=1, day=1)
+    return today  # 'hoy'
+
+
 @solo_admin
 def dashboard_principal(request):
     today = timezone.now().date()
+    rango = request.GET.get('rango', 'hoy')
+    if rango not in _RANGO_LABELS:
+        rango = 'hoy'
+    fecha_inicio = _rango_inicio(rango, today)
 
-    total_pedidos_hoy = Pedido.objects.filter(fecha_creacion__date=today).count()
+    total_pedidos_hoy = Pedido.objects.filter(
+        fecha_creacion__date__gte=fecha_inicio,
+        fecha_creacion__date__lte=today,
+    ).exclude(estado='cancelado').count()
 
     ingresos_hoy = (
         Pedido.objects
-        .filter(fecha_creacion__date=today, estado='entregado')
+        .filter(
+            fecha_creacion__date__gte=fecha_inicio,
+            fecha_creacion__date__lte=today,
+            estado__in=['listo', 'entregado'],
+        )
+        .aggregate(total=Sum('total'))['total'] or 0
+    )
+
+    ingresos_en_proceso = (
+        Pedido.objects
+        .filter(
+            fecha_creacion__date__gte=fecha_inicio,
+            fecha_creacion__date__lte=today,
+            estado__in=['pendiente', 'en_preparacion'],
+        )
         .aggregate(total=Sum('total'))['total'] or 0
     )
 
@@ -90,10 +129,14 @@ def dashboard_principal(request):
     )
 
     return render(request, 'dashboard/principal.html', {
-        'total_pedidos_hoy': total_pedidos_hoy,
-        'ingresos_hoy': ingresos_hoy,
-        'mesas_ocupadas': mesas_ocupadas,
-        'stock_bajo_count': stock_bajo_count,
+        'total_pedidos_hoy':   total_pedidos_hoy,
+        'ingresos_hoy':        ingresos_hoy,
+        'ingresos_en_proceso': ingresos_en_proceso,
+        'mesas_ocupadas':      mesas_ocupadas,
+        'stock_bajo_count':    stock_bajo_count,
+        'rango':               rango,
+        'rango_label':         _RANGO_LABELS[rango],
+        'rango_opciones':      list(_RANGO_LABELS.items()),
     })
 
 
@@ -101,21 +144,24 @@ def dashboard_principal(request):
 
 @solo_admin
 def json_platos_mas_vendidos(request):
-    inicio_mes = timezone.now().date().replace(day=1)
+    today = timezone.now().date()
+    rango = request.GET.get('rango', 'mes')
+    desde = _rango_inicio(rango if rango in _RANGO_LABELS else 'mes', today)
 
     platos = (
         DetallePedido.objects
-        .filter(pedido__fecha_creacion__date__gte=inicio_mes)
+        .filter(pedido__fecha_creacion__date__gte=desde)
+        .exclude(pedido__estado='cancelado')
         .values('plato__nombre')
         .annotate(total_vendido=Sum('cantidad'))
         .order_by('-total_vendido')[:5]
     )
 
     labels = [p['plato__nombre'] for p in platos]
-    data = [p['total_vendido'] for p in platos]
+    valores = [p['total_vendido'] for p in platos]
     colores = _CHART_COLORS[:len(labels)]
 
-    return JsonResponse({'labels': labels, 'data': data, 'colores': colores})
+    return JsonResponse({'labels': labels, 'valores': valores, 'colores': colores})
 
 
 @solo_admin
@@ -124,7 +170,7 @@ def json_ingresos_por_mes(request):
 
     ingresos = (
         Pedido.objects
-        .filter(estado='entregado', fecha_creacion__gte=hace_12_meses)
+        .filter(estado__in=['listo', 'entregado'], fecha_creacion__gte=hace_12_meses)
         .annotate(mes=TruncMonth('fecha_creacion'))
         .values('mes')
         .annotate(total=Sum('total'))
@@ -132,9 +178,9 @@ def json_ingresos_por_mes(request):
     )
 
     labels = [_fmt_mes(row['mes']) for row in ingresos]
-    data = [float(row['total']) for row in ingresos]
+    valores = [float(row['total']) for row in ingresos]
 
-    return JsonResponse({'labels': labels, 'data': data})
+    return JsonResponse({'labels': labels, 'valores': valores})
 
 
 @solo_admin
@@ -147,9 +193,9 @@ def json_pedidos_por_estado(request):
     )
 
     labels = [_ESTADO_LABELS.get(row['estado'], row['estado']) for row in estados]
-    data = [row['total'] for row in estados]
+    valores = [row['total'] for row in estados]
 
-    return JsonResponse({'labels': labels, 'data': data})
+    return JsonResponse({'labels': labels, 'valores': valores})
 
 
 @solo_admin
@@ -166,35 +212,44 @@ def json_reservas_por_mes(request):
     )
 
     labels = [_fmt_mes(row['mes']) for row in reservas]
-    data = [row['total'] for row in reservas]
+    valores = [row['total'] for row in reservas]
 
-    return JsonResponse({'labels': labels, 'data': data})
+    return JsonResponse({'labels': labels, 'valores': valores})
 
 
 @solo_admin
 def json_ocupacion_mesas(request):
-    hace_30_dias = timezone.now().date() - timedelta(days=30)
+    today = timezone.now().date()
+    inicio_mes = today.replace(day=1)
+    dias_en_mes = max((today - inicio_mes).days + 1, 1)
 
-    mesas = (
-        Mesa.objects
-        .filter(activa=True)
-        .annotate(
-            dias_ocupados=Count(
-                'reservas__fecha',
-                filter=Q(
-                    reservas__estado='confirmada',
-                    reservas__fecha__gte=hace_30_dias,
-                ),
-                distinct=True,
-            )
+    mesas_qs = Mesa.objects.filter(activa=True).order_by('numero')
+    resultado = []
+
+    for mesa in mesas_qs:
+        pedidos_mes = (
+            Pedido.objects
+            .filter(mesa=mesa, fecha_creacion__date__gte=inicio_mes)
+            .exclude(estado='cancelado')
+            .count()
         )
-        .order_by('numero')
-    )
+        dias_activos = (
+            Pedido.objects
+            .filter(mesa=mesa, fecha_creacion__date__gte=inicio_mes)
+            .exclude(estado='cancelado')
+            .dates('fecha_creacion', 'day')
+            .count()
+        )
+        porcentaje = round((dias_activos / dias_en_mes) * 100, 1)
+        resultado.append({
+            'numero':     mesa.numero,
+            'ubicacion':  mesa.get_ubicacion_display(),
+            'capacidad':  mesa.capacidad,
+            'pedidos_mes': pedidos_mes,
+            'porcentaje': porcentaje,
+        })
 
-    labels = [f'Mesa {m.numero}' for m in mesas]
-    data = [min(round((m.dias_ocupados / 30) * 100, 1), 100) for m in mesas]
-
-    return JsonResponse({'labels': labels, 'data': data})
+    return JsonResponse({'mesas': resultado})
 
 
 # ── Exportaciones ─────────────────────────────────────────────────────────────

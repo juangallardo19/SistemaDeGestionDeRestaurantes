@@ -393,39 +393,21 @@ async function cargarOcupacion() {
 }
 
 /* ---------------------------------------------------------
-   Modal de exportación
+   Panel de exportación (inline — sin modal)
    --------------------------------------------------------- */
-function initExportModal() {
-  const modal        = document.getElementById('exportModal');
-  const modalTitle   = document.getElementById('exportModalTitle');
-  const desdeInput   = document.getElementById('exportFechaDesde');
-  const hastaInput   = document.getElementById('exportFechaHasta');
-  const errorEl      = document.getElementById('exportError');
-  const confirmarBtn = document.getElementById('exportConfirmarBtn');
+function initExportPanel() {
+  const desdeInput = document.getElementById('exportDesde');
+  const hastaInput = document.getElementById('exportHasta');
+  const errorEl    = document.getElementById('exportPanelError');
 
-  let currentUrl = '';
+  // Presetear fechas al primer día del mes actual → hoy
+  const hoy      = new Date();
+  const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  if (desdeInput) desdeInput.value = primerDia.toISOString().split('T')[0];
+  if (hastaInput) hastaInput.value = hoy.toISOString().split('T')[0];
 
-  // Botones de exportación
   document.querySelectorAll('[data-export-url]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentUrl = btn.dataset.exportUrl;
-      const label = btn.dataset.exportLabel || 'Exportar reporte';
-      if (modalTitle) modalTitle.textContent = label;
-      if (errorEl)    errorEl.hidden = true;
-
-      // Presetear fechas (mes actual)
-      const hoy = new Date();
-      const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-      if (desdeInput) desdeInput.value = primerDia.toISOString().split('T')[0];
-      if (hastaInput) hastaInput.value = hoy.toISOString().split('T')[0];
-
-      bootstrap.Modal.getOrCreateInstance(modal).show();
-    });
-  });
-
-  // Confirmar descarga
-  if (confirmarBtn) {
-    confirmarBtn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const desde = desdeInput?.value;
       const hasta = hastaInput?.value;
 
@@ -435,11 +417,41 @@ function initExportModal() {
       }
       if (errorEl) errorEl.hidden = true;
 
-      const url = `${currentUrl}?fecha_desde=${desde}&fecha_hasta=${hasta}`;
-      window.location.href = url;
-      bootstrap.Modal.getInstance(modal)?.hide();
+      const exportUrl = btn.dataset.exportUrl;
+      const url = `${exportUrl}?fecha_desde=${desde}&fecha_hasta=${hasta}`;
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generando...';
+
+      try {
+        const resp = await fetch(url, { credentials: 'same-origin' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const blob = await resp.blob();
+        const disposition = resp.headers.get('Content-Disposition') || '';
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        const filename = match ? match[1] : 'reporte';
+
+        const objUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objUrl);
+      } catch (err) {
+        console.error('[Dashboard] export error:', err);
+        if (errorEl) {
+          errorEl.textContent = 'Error al generar el reporte. Intentá nuevamente.';
+          errorEl.hidden = false;
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
     });
-  }
+  });
 }
 
 /* ---------------------------------------------------------
@@ -474,6 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarOcupacion(),
   ]);
 
-  // Inicializar modal de exportación
-  initExportModal();
+  // Inicializar panel de exportación
+  initExportPanel();
 });

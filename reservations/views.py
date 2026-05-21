@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import admin_required, mesero_required
-from accounts.email_utils import send_confirmacion_reserva
+from accounts.email_utils import send_confirmacion_reserva, send_reserva_confirmada
 
 from .forms import FiltroReservaForm, MesaForm, ReservaForm
 from .models import Mesa, Reserva
@@ -90,10 +90,95 @@ def confirmar_reserva(request, pk):
         if reserva.estado == 'pendiente':
             reserva.estado = 'confirmada'
             reserva.save()
-            messages.success(request, f'Reserva #{pk} confirmada exitosamente.')
+            send_reserva_confirmada(reserva)
+            messages.success(
+                request,
+                f'Reserva #{pk} confirmada. Se notificó al cliente por correo.',
+            )
         else:
             messages.warning(request, f'La reserva #{pk} no está en estado pendiente.')
     return redirect('reservations:lista_reservas')
+
+
+@mesero_required
+def completar_reserva(request, pk):
+    reserva = get_object_or_404(Reserva, pk=pk)
+    if request.method == 'POST':
+        if reserva.estado == 'confirmada':
+            reserva.estado = 'completada'
+            reserva.save()
+            messages.success(
+                request,
+                f'Reserva #{pk} marcada como completada. La mesa queda liberada.',
+            )
+        else:
+            messages.warning(request, 'Solo se pueden completar reservas en estado confirmada.')
+    return redirect('reservations:lista_reservas')
+
+
+@mesero_required
+def mesa_detalle(request, pk):
+    from orders.models import Pedido
+    mesa = get_object_or_404(Mesa, pk=pk, activa=True)
+    today = date.today()
+
+    pedidos_activos = (
+        Pedido.objects
+        .filter(mesa=mesa, estado__in=['pendiente', 'en_preparacion', 'listo'])
+        .select_related('cliente', 'mesero')
+        .prefetch_related('detalles__plato')
+        .order_by('fecha_creacion')
+    )
+    reserva_hoy = Reserva.objects.filter(
+        mesa=mesa, fecha=today, estado__in=['pendiente', 'confirmada']
+    ).select_related('cliente').first()
+
+    total_mesa = sum(p.total for p in pedidos_activos)
+
+    return render(request, 'reservations/mesa_detalle.html', {
+        'mesa': mesa,
+        'pedidos_activos': pedidos_activos,
+        'reserva_hoy': reserva_hoy,
+        'total_mesa': total_mesa,
+        'today': today,
+    })
+
+
+@mesero_required
+def mesas_overview(request):
+    from orders.models import Pedido
+    today = date.today()
+    mesas = Mesa.objects.filter(activa=True).order_by('numero')
+    mesa_data = []
+    for mesa in mesas:
+        reserva_hoy = Reserva.objects.filter(
+            mesa=mesa, fecha=today, estado__in=['pendiente', 'confirmada']
+        ).select_related('cliente').first()
+        pedidos_activos = list(
+            Pedido.objects.filter(
+                mesa=mesa, estado__in=['pendiente', 'en_preparacion', 'listo']
+            ).select_related('cliente')
+        )
+        total_mesa = sum(p.total for p in pedidos_activos)
+        if pedidos_activos and reserva_hoy:
+            estado = 'mixta'
+        elif pedidos_activos:
+            estado = 'con_pedido'
+        elif reserva_hoy:
+            estado = 'reservada'
+        else:
+            estado = 'libre'
+        mesa_data.append({
+            'mesa': mesa,
+            'reserva_hoy': reserva_hoy,
+            'pedidos_activos': pedidos_activos,
+            'total_mesa': total_mesa,
+            'estado': estado,
+        })
+    return render(request, 'reservations/mesas_overview.html', {
+        'mesa_data': mesa_data,
+        'today': today,
+    })
 
 
 # ── CRUD Mesas ────────────────────────────────────────────────────────────────

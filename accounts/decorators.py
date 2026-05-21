@@ -35,3 +35,8 @@ def solo_admin(view_func):
 
 def solo_mesero_o_admin(view_func):
     return rol_requerido(['admin', 'mesero'])(view_func)
+
+
+# Alias usados en las vistas de las apps
+admin_required   = solo_admin
+mesero_required  = solo_mesero_o_admin

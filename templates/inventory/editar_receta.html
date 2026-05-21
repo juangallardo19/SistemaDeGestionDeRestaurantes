@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Receta — {{ plato.nombre }} — RestaurApp{% endblock %}
+
+{% block extra_css %}
+<style>
+.ingrediente-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  gap: 1rem;
+}
+.ingrediente-row:last-child { border-bottom: none; }
+.ingrediente-row:hover { background: var(--color-bg); }
+
+.ingrediente-name {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--color-text);
+}
+.ingrediente-cantidad {
+  font-size: .85rem;
+  color: var(--color-text-muted);
+}
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 600;
+}
+.stock-ok   { background: #D1FAE5; color: #065F46; }
+.stock-low  { background: #FEE2E2; color: #991B1B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4" style="max-width:750px;">
+
+  <!-- Encabezado -->
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <a href="{% url 'inventory:recetas' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div>
+      <h2 class="mb-0">
+        <i class="fa-solid fa-book-open me-2" style="color:var(--color-primary);"></i>
+        {{ plato.nombre }}
+      </h2>
+      <p class="text-muted small mb-0">{{ plato.categoria.nombre }}</p>
+    </div>
+  </div>
+
+  <!-- Ingredientes actuales -->
+  <div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-transparent border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">
+        <i class="fa-solid fa-list-ul me-1"></i>Ingredientes de esta receta
+      </span>
+      <span class="badge rounded-pill"
+            style="background:var(--color-primary-pale);color:var(--color-primary);font-size:.78rem;">
+        {{ ingredientes_plato.count }} ingrediente{{ ingredientes_plato.count|pluralize }}
+      </span>
+    </div>
+
+    {% if ingredientes_plato %}
+    <div class="card-body p-0">
+      {% for pi in ingredientes_plato %}
+      <div class="ingrediente-row">
+        <div>
+          <div class="ingrediente-name">{{ pi.ingrediente.nombre }}</div>
+          <div class="ingrediente-cantidad">
+            {{ pi.cantidad_necesaria }} {{ pi.ingrediente.unidad_medida }} por porción
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="stock-badge {% if pi.ingrediente.stock_bajo %}stock-low{% else %}stock-ok{% endif %}">
+            {% if pi.ingrediente.stock_bajo %}
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            {% else %}
+              <i class="fa-solid fa-box"></i>
+            {% endif %}
+            Stock: {{ pi.ingrediente.stock_actual }} {{ pi.ingrediente.unidad_medida }}
+          </span>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="eliminar">
+            <input type="hidden" name="pi_pk" value="{{ pi.pk }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('¿Quitar {{ pi.ingrediente.nombre }} de esta receta?')">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="card-body text-center py-4">
+      <i class="fa-solid fa-triangle-exclamation fs-3 mb-2 d-block" style="color:#F59E0B;opacity:.6;"></i>
+      <p class="text-muted mb-0 small">
+        Este plato no tiene ingredientes configurados.<br>
+        El stock <strong>no se descontará</strong> cuando se pida.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Agregar ingrediente -->
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-transparent border-bottom py-3 px-4">
+      <span class="fw-semibold">
+        <i class="fa-solid fa-plus me-1"></i>Agregar ingrediente
+      </span>
+    </div>
+    <div class="card-body px-4 py-3">
+      {% if form.fields.ingrediente.queryset.count == 0 %}
+      <p class="text-muted small mb-0">
+        <i class="fa-solid fa-check-circle me-1" style="color:#10B981;"></i>
+        Todos los ingredientes disponibles ya están en esta receta.
+      </p>
+      {% else %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="agregar">
+        <div class="row g-3 align-items-end">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold">Ingrediente</label>
+            {{ form.ingrediente }}
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label small fw-semibold">
+              Cantidad por porción
+              <span class="text-muted fw-normal">(en unidad del ingrediente)</span>
+            </label>
+            {{ form.cantidad_necesaria }}
+          </div>
+          <div class="col-sm-2">
+            <button type="submit" class="btn btn-primary-custom w-100">
+              <i class="fa-solid fa-plus me-1"></i>Agregar
+            </button>
+          </div>
+        </div>
+        {% if form.errors %}
+        <div class="mt-2">
+          {% for field in form %}
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
