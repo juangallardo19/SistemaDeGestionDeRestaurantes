@@ -828,3 +828,148 @@ main.page-content {
 .text-primary-warm { color: var(--color-primary) !important; }
 .bg-cream          { background-color: var(--color-cream) !important; }
 .border-warm       { border-color: var(--color-border) !important; }
+
+/* ---------------------------------------------------------
+   17. Responsive / mobile
+   --------------------------------------------------------- */
+
+/* KPI cards: 2 columnas en tablet, 1 en móvil */
+@media (max-width: 575.98px) {
+    .kpi-value {
+        font-size: 1.9rem;
+    }
+    .row.g-3 > .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 399.98px) {
+    .kpi-value { font-size: 1.6rem; }
+    .row.g-3 > .col-sm-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Gráficos: altura fija en móvil para evitar colapso */
+@media (max-width: 767.98px) {
+    .chart-wrapper {
+        min-height: 220px !important;
+    }
+    .chart-section {
+        padding: 1rem;
+    }
+}
+
+/* Historial de pedidos: tabla con scroll horizontal en móvil */
+@media (max-width: 767.98px) {
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+    /* Ocultar columnas menos críticas en pantallas pequeñas */
+    .historial-table th.col-hide-sm,
+    .historial-table td.col-hide-sm {
+        display: none;
+    }
+}
+
+/* Filtros: stack vertical en móvil */
+@media (max-width: 575.98px) {
+    .filter-badge {
+        font-size: .7rem;
+        padding: .25rem .5rem;
+    }
+    .totales-strip .totales-value {
+        font-size: 1.2rem;
+    }
+}
+
+/* Botones de exportación: apilan verticalmente en móvil */
+@media (max-width: 575.98px) {
+    .btn-export,
+    .btn-export-sm {
+        width: 100%;
+        justify-content: center;
+    }
+    /* Sección de exportación del dashboard */
+    .d-flex.flex-wrap.gap-2 {
+        flex-direction: column;
+    }
+    /* Revertir para contenedores que no son de export */
+    .d-flex.flex-wrap.gap-2.align-items-center {
+        flex-direction: row;
+    }
+}
+
+/* Navbar: ajuste en móvil */
+@media (max-width: 991.98px) {
+    .navbar-collapse .navbar-nav {
+        padding: .5rem 0;
+        gap: .15rem;
+    }
+    .navbar-collapse .nav-link {
+        padding: .5rem .75rem;
+        border-radius: var(--radius-sm);
+    }
+    .navbar-collapse .nav-link:hover {
+        background: rgba(255,255,255,.07);
+    }
+    .navbar-collapse .dropdown-menu {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding-left: 1rem;
+    }
+    .navbar-collapse .dropdown-item {
+        color: rgba(250,243,232,.75);
+    }
+    .navbar-collapse .dropdown-item:hover {
+        background: rgba(255,255,255,.07);
+        color: #fff;
+    }
+}
+
+/* Filtros de historial: acordeón colapsable en móvil */
+@media (max-width: 767.98px) {
+    .filter-collapse-toggle {
+        display: flex !important;
+    }
+    .filter-collapse-body {
+        display: none;
+    }
+    .filter-collapse-body.show {
+        display: block;
+    }
+}
+@media (min-width: 768px) {
+    .filter-collapse-toggle { display: none !important; }
+    .filter-collapse-body   { display: block !important; }
+}
+
+/* Cards de categoría de stock: 1 col en móvil */
+@media (max-width: 575.98px) {
+    .cat-card { border-radius: 12px; }
+    .cat-card-header { padding: .85rem 1rem .65rem; }
+    .ing-row { padding: .5rem 1rem; grid-template-columns: 1fr; }
+    .ing-stock-wrap { min-width: unset; }
+}
+
+/* Modal de exportación: full-width en móvil */
+@media (max-width: 575.98px) {
+    .modal-dialog { margin: .5rem; }
+    .modal-content { border-radius: 14px; }
+}
+
+/* Tabla de ocupación de mesas: scroll en móvil */
+@media (max-width: 767.98px) {
+    #ocupacion-container { overflow-x: auto; }
+}
+
+/* Paginación: reducir padding en móvil */
+@media (max-width: 575.98px) {
+    .pagination .page-link {
+        padding: .3rem .55rem;
+        font-size: .8rem;
+    }
+}
