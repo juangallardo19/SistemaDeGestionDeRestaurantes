@@ -8,9 +8,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import admin_required, mesero_required
 from accounts.email_utils import send_alerta_stock_bajo
-from menu.models import Ingrediente, PlatoIngrediente
+from menu.models import Ingrediente, Plato, PlatoIngrediente
 
-from .forms import MovimientoInventarioForm
+from .forms import MovimientoInventarioForm, PlatoIngredienteForm
 from .models import MovimientoInventario
 
 logger = logging.getLogger(__name__)
@@ -25,10 +25,13 @@ def lista_inventario(request):
         stock_actual__lte=F('stock_minimo'),
     ).count()
 
+    sin_receta_count = Plato.objects.filter(plato_ingredientes__isnull=True).count()
+
     return render(request, 'inventory/lista_inventario.html', {
         'ingredientes': ingredientes,
         'solo_bajo_stock': solo_bajo_stock,
         'n_bajo_stock': n_bajo_stock,
+        'sin_receta_count': sin_receta_count,
     })
 
 
@@ -120,6 +123,68 @@ def detalle_ingrediente(request, pk):
     return render(request, 'inventory/detalle_ingrediente.html', {
         'ingrediente': ingrediente,
         'movimientos': movimientos,
+    })
+
+
+@admin_required
+def gestionar_recetas(request):
+    platos = (
+        Plato.objects
+        .prefetch_related('plato_ingredientes__ingrediente')
+        .order_by('categoria__nombre', 'nombre')
+    )
+    platos_data = []
+    for plato in platos:
+        n = plato.plato_ingredientes.count()
+        platos_data.append({'plato': plato, 'n_ingredientes': n, 'sin_receta': n == 0})
+
+    sin_receta_count = sum(1 for p in platos_data if p['sin_receta'])
+
+    return render(request, 'inventory/gestionar_recetas.html', {
+        'platos_data': platos_data,
+        'sin_receta_count': sin_receta_count,
+    })
+
+
+@admin_required
+def editar_receta(request, plato_pk):
+    plato = get_object_or_404(Plato, pk=plato_pk)
+    ingredientes_plato = (
+        plato.plato_ingredientes
+        .select_related('ingrediente')
+        .order_by('ingrediente__nombre')
+    )
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'agregar':
+            form = PlatoIngredienteForm(request.POST, plato=plato)
+            if form.is_valid():
+                pi = form.save(commit=False)
+                pi.plato = plato
+                pi.save()
+                messages.success(
+                    request,
+                    f'"{pi.ingrediente.nombre}" agregado a la receta de {plato.nombre}.',
+                )
+                return redirect('inventory:editar_receta', plato_pk=plato_pk)
+        elif action == 'eliminar':
+            pi_pk = request.POST.get('pi_pk')
+            pi = get_object_or_404(PlatoIngrediente, pk=pi_pk, plato=plato)
+            nombre = pi.ingrediente.nombre
+            pi.delete()
+            messages.success(request, f'"{nombre}" eliminado de la receta.')
+            return redirect('inventory:editar_receta', plato_pk=plato_pk)
+        else:
+            form = PlatoIngredienteForm(plato=plato)
+    else:
+        form = PlatoIngredienteForm(plato=plato)
+
+    return render(request, 'inventory/editar_receta.html', {
+        'plato': plato,
+        'ingredientes_plato': ingredientes_plato,
+        'form': form,
     })
 
 

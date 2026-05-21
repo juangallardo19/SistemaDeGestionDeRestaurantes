@@ -11,4 +11,6 @@ urlpatterns = [
     path('historial/', views.historial_movimientos, name='historial'),
     path('ingrediente/<int:pk>/', views.detalle_ingrediente, name='detalle_ingrediente'),
     path('stock-categoria/', views.stock_por_categoria, name='stock_categoria'),
+    path('recetas/', views.gestionar_recetas, name='recetas'),
+    path('recetas/<int:plato_pk>/', views.editar_receta, name='editar_receta'),
 ]

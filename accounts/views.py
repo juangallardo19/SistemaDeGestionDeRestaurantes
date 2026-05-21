@@ -77,7 +77,7 @@ def profile_view(request):
 
 def _redirect_by_role(user):
     if user.is_admin:
-        return redirect('dashboard:index')
+        return redirect('dashboard:principal')
     if user.is_mesero:
         return redirect('orders:list')
     return redirect('menu:list')

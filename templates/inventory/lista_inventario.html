@@ -20,6 +20,21 @@
     </div>
   </div>
 
+  <!-- Aviso platos sin receta -->
+  {% if sin_receta_count %}
+  <div class="alert d-flex align-items-center gap-3 mb-3"
+       style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;">
+    <i class="fa-solid fa-triangle-exclamation fs-5 flex-shrink-0" style="color:#D97706;"></i>
+    <div class="flex-grow-1 small">
+      <strong style="color:#92400E;">{{ sin_receta_count }} plato{{ sin_receta_count|pluralize }} sin receta configurada</strong>
+      — el stock no se descontará al pedirlos.
+    </div>
+    <a href="{% url 'inventory:recetas' %}" class="btn btn-sm btn-warning fw-semibold ms-auto">
+      <i class="fa-solid fa-book-open me-1"></i>Configurar recetas
+    </a>
+  </div>
+  {% endif %}
+
   <!-- Filtro stock bajo -->
   <div class="d-flex align-items-center gap-3 mb-4">
     <div class="form-check form-switch mb-0">

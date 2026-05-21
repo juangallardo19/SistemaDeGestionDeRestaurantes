@@ -64,6 +64,35 @@ def send_confirmacion_reserva(reserva):
         logger.exception('Error enviando confirmación de reserva #%s', reserva.pk)
 
 
+def send_reserva_confirmada(reserva):
+    """Notifica al cliente que el restaurante confirmó su reserva."""
+    try:
+        if not reserva.cliente.email:
+            return
+
+        context = {
+            'reserva': reserva,
+            'cliente': reserva.cliente,
+            'mesa': reserva.mesa,
+        }
+        html_message = render_to_string('emails/confirmacion_reserva.html', context)
+
+        send_mail(
+            subject='Tu reserva fue confirmada — RestaurApp',
+            message=(
+                f'Hola {reserva.cliente.get_full_name() or reserva.cliente.username}, '
+                f'tu reserva del {reserva.fecha} a las {reserva.hora_inicio} '
+                f'en mesa {reserva.mesa.numero} fue confirmada por el restaurante.'
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[reserva.cliente.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception('Error enviando confirmación de reserva #%s', reserva.pk)
+
+
 def send_cambio_estado_pedido(pedido, estado_anterior):
     """Notifica al cliente cuando el estado de su pedido cambia."""
     try:

@@ -1,8 +1,10 @@
 <nav class="navbar navbar-expand-lg site-navbar" aria-label="Navegación principal">
-    <div class="container-fluid">
+    <div class="container-fluid px-4">
 
         <a class="navbar-brand site-brand" href="/">
-            <span class="brand-icon" aria-hidden="true"><i class="fa-solid fa-utensils"></i></span>
+            <span class="brand-icon" aria-hidden="true">
+                <i class="fa-solid fa-utensils"></i>
+            </span>
             <span class="brand-name">RestaurApp</span>
         </a>
 
@@ -15,7 +17,9 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+            <!-- Links principales (centrados en desktop) -->
+            <ul class="navbar-nav mb-2 mb-lg-0 navbar-nav-center">
 
                 {% if user.is_authenticated %}
 
@@ -27,11 +31,6 @@
 
                 {% if user.is_cliente or user.is_admin %}
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="{% url 'orders:cart' %}">
-                        <i class="fa-solid fa-cart-shopping me-1" aria-hidden="true"></i>Mis Pedidos
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link nav-link-custom" href="{% url 'reservations:list' %}">
                         <i class="fa-solid fa-calendar-check me-1" aria-hidden="true"></i>Mis Reservas
                     </a>
@@ -40,12 +39,17 @@
 
                 {% if user.is_mesero or user.is_admin %}
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="{% url 'orders:list' %}">
-                        <i class="fa-solid fa-receipt me-1" aria-hidden="true"></i>Pedidos Activos
+                    <a class="nav-link nav-link-custom" href="{% url 'orders:cart' %}">
+                        <i class="fa-solid fa-cart-plus me-1" aria-hidden="true"></i>Tomar pedido
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="#">
+                    <a class="nav-link nav-link-custom" href="{% url 'orders:list' %}">
+                        <i class="fa-solid fa-receipt me-1" aria-hidden="true"></i>Pedidos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom" href="{% url 'reservations:mesas_overview' %}">
                         <i class="fa-solid fa-chair me-1" aria-hidden="true"></i>Mesas
                     </a>
                 </li>
@@ -59,7 +63,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-custom">
                         <li>
-                            <a class="dropdown-item" href="{% url 'dashboard:index' %}">
+                            <a class="dropdown-item" href="{% url 'dashboard:principal' %}">
                                 <i class="fa-solid fa-chart-line me-2" aria-hidden="true"></i>Dashboard
                             </a>
                         </li>
@@ -69,7 +73,17 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/admin/auth/user/">
+                            <a class="dropdown-item" href="{% url 'inventory:recetas' %}">
+                                <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Recetas
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'reservations:crud_mesas' %}">
+                                <i class="fa-solid fa-chair me-2" aria-hidden="true"></i>Gestionar Mesas
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/accounts/customuser/">
                                 <i class="fa-solid fa-users me-2" aria-hidden="true"></i>Usuarios
                             </a>
                         </li>
@@ -86,18 +100,20 @@
                 {% endif %}
             </ul>
 
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-2">
+            <!-- Acciones de la derecha -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
 
-                <li class="nav-item">
-                    <button class="btn-theme-toggle" id="themeToggle"
-                            title="Cambiar tema" aria-label="Cambiar tema claro/oscuro">
-                        <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
-                    </button>
-                </li>
+                <button class="btn-theme-toggle" id="themeToggle"
+                        title="Cambiar tema" aria-label="Cambiar tema claro/oscuro">
+                    <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
+                </button>
 
                 {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link nav-link-custom user-dropdown-toggle dropdown-toggle"
+
+                <span class="nav-divider d-none d-lg-block" aria-hidden="true"></span>
+
+                <div class="dropdown">
+                    <a class="nav-link nav-link-custom user-dropdown-toggle dropdown-toggle d-flex align-items-center gap-2"
                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="user-avatar" aria-hidden="true">
                             {% if user.profile_picture %}
@@ -107,7 +123,7 @@
                                 <i class="fa-solid fa-circle-user"></i>
                             {% endif %}
                         </span>
-                        <span class="user-name d-none d-lg-inline ms-1">
+                        <span class="user-name d-none d-lg-inline">
                             {{ user.get_full_name|default:user.username }}
                         </span>
                     </a>
@@ -133,23 +149,20 @@
                             </form>
                         </li>
                     </ul>
-                </li>
+                </div>
 
                 {% else %}
 
-                <li class="nav-item">
-                    <a class="nav-link nav-link-custom" href="{% url 'accounts:login' %}">
-                        <i class="fa-solid fa-right-to-bracket me-1" aria-hidden="true"></i>Iniciar Sesión
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-nav-register" href="{% url 'accounts:register' %}">
-                        <i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i>Registrarse
-                    </a>
-                </li>
+                <a class="nav-link nav-link-custom" href="{% url 'accounts:login' %}">
+                    <i class="fa-solid fa-right-to-bracket me-1" aria-hidden="true"></i>Iniciar Sesión
+                </a>
+                <a class="btn btn-nav-register" href="{% url 'accounts:register' %}">
+                    <i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i>Registrarse
+                </a>
 
                 {% endif %}
-            </ul>
+            </div>
+
         </div>
     </div>
 </nav>

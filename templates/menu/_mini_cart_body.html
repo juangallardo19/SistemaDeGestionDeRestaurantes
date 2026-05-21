@@ -1,0 +1,36 @@
+{% if carrito %}
+<div class="mini-cart-items">
+  {% for item in carrito %}
+  <div class="mini-cart-item" data-plato-id="{{ item.plato.pk }}">
+    <span class="mini-cart-item-name" title="{{ item.plato.nombre }}">{{ item.plato.nombre }}</span>
+    <div class="qty-controls">
+      <button class="qty-btn js-dec" data-id="{{ item.plato.pk }}">−</button>
+      <input class="qty-input js-qty" type="number" min="1" max="20"
+             value="{{ item.cantidad }}" data-id="{{ item.plato.pk }}">
+      <button class="qty-btn js-inc" data-id="{{ item.plato.pk }}">+</button>
+    </div>
+    <div class="mini-cart-item-right">
+      <span class="mini-cart-item-price">${{ item.subtotal }}</span>
+      <button class="btn-remove js-rem" data-id="{{ item.plato.pk }}" title="Quitar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="mini-cart-footer">
+  <div class="mini-cart-total">
+    <span>Total</span>
+    <strong>${{ carrito.get_total }}</strong>
+  </div>
+  <a href="{% url 'orders:crear_pedido' %}" class="btn-confirm">
+    <i class="fa-solid fa-check me-1"></i>Confirmar pedido
+  </a>
+</div>
+{% else %}
+<div class="mini-cart-empty">
+  <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+  <p>Tu carrito está vacío</p>
+  <p class="hint">Usá el botón <strong>+</strong> para agregar platos</p>
+</div>
+{% endif %}

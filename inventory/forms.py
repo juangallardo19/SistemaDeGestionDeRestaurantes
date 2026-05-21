@@ -1,6 +1,33 @@
 from django import forms
 
+from menu.models import Ingrediente, PlatoIngrediente
+
 from .models import MovimientoInventario
+
+
+class PlatoIngredienteForm(forms.ModelForm):
+    class Meta:
+        model = PlatoIngrediente
+        fields = ['ingrediente', 'cantidad_necesaria']
+        widgets = {
+            'ingrediente':       forms.Select(attrs={'class': 'form-select'}),
+            'cantidad_necesaria': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0.01',
+                'placeholder': 'Ej: 0.25',
+            }),
+        }
+
+    def __init__(self, *args, plato=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.plato = plato
+        if plato:
+            usados = plato.plato_ingredientes.values_list('ingrediente_id', flat=True)
+            qs = Ingrediente.objects.filter(activo=True).exclude(pk__in=usados)
+            self.fields['ingrediente'].queryset = qs
+        else:
+            self.fields['ingrediente'].queryset = Ingrediente.objects.filter(activo=True)
 
 
 class MovimientoInventarioForm(forms.ModelForm):
