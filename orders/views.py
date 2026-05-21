@@ -4,7 +4,9 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import admin_required, mesero_required
@@ -17,6 +19,7 @@ from inventory.models import MovimientoInventario
 from menu.models import Plato, PlatoIngrediente
 
 from .carrito import Carrito
+from .filters import PedidoFilter
 from .forms import (
     AgregarAlCarritoForm,
     AsignarMeseroForm,
@@ -29,10 +32,6 @@ logger = logging.getLogger(__name__)
 
 
 def _descontar_ingredientes(pedido, responsable):
-    """
-    Por cada DetallePedido descuenta del stock los ingredientes del plato,
-    registra el movimiento en inventario y emite alerta si el stock queda bajo.
-    """
     for detalle in pedido.detalles.select_related('plato').all():
         for pi in PlatoIngrediente.objects.filter(
             plato=detalle.plato
@@ -130,7 +129,6 @@ def crear_pedido(request):
                     pedido.calcular_total()
                     _descontar_ingredientes(pedido, request.user)
 
-                # Email y limpieza del carrito fuera de la transacción
                 send_confirmacion_pedido(pedido)
                 carrito.limpiar()
                 messages.success(
@@ -238,24 +236,72 @@ def cambiar_estado_pedido(request, pk):
 
 @admin_required
 def historial_pedidos(request):
-    pedidos = Pedido.objects.select_related('cliente', 'mesero').all()
+    qs = Pedido.objects.select_related('cliente', 'mesero').prefetch_related('detalles')
 
-    estado_filtro = request.GET.get('estado', '')
-    fecha_filtro = request.GET.get('fecha', '')
+    # Translate legacy single-date param to range for PedidoFilter
+    get_data = request.GET.copy()
+    if get_data.get('fecha') and not get_data.get('fecha_desde'):
+        get_data['fecha_desde'] = get_data['fecha']
+        get_data['fecha_hasta'] = get_data['fecha']
 
-    if estado_filtro:
-        pedidos = pedidos.filter(estado=estado_filtro)
+    pedidos_qs = PedidoFilter(get_data, qs).filter()
 
-    if fecha_filtro:
-        try:
-            fecha = date.fromisoformat(fecha_filtro)
-            pedidos = pedidos.filter(fecha_creacion__date=fecha)
-        except ValueError:
-            pass
+    totales = pedidos_qs.aggregate(
+        total_ingresos=Sum('total'),
+        total_count=Count('pk'),
+    )
+
+    paginator = Paginator(pedidos_qs, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'orders/historial_pedidos.html', {
-        'pedidos': pedidos,
-        'estado_filtro': estado_filtro,
-        'fecha_filtro': fecha_filtro,
+        'pedidos': page_obj,
+        'page_obj': page_obj,
         'estado_choices': Pedido.ESTADO_CHOICES,
+        'estado_filtro': request.GET.get('estado', ''),
+        'fecha_filtro': request.GET.get('fecha', ''),
+        'total_ingresos': totales['total_ingresos'] or Decimal('0'),
+        'total_count': totales['total_count'] or 0,
+    })
+
+
+# ── Reportes ──────────────────────────────────────────────────────────────────
+
+@admin_required
+def reporte_ventas_diarias(request):
+    from .reporte_ventas import (
+        platos_mas_vendidos,
+        resumen_por_mesero,
+        ventas_del_dia,
+        ventas_por_rango,
+    )
+
+    fecha_str = request.GET.get('fecha', '')
+    try:
+        fecha = date.fromisoformat(fecha_str) if fecha_str else date.today()
+    except ValueError:
+        fecha = date.today()
+
+    kpis = ventas_del_dia(fecha)
+
+    # Prepare pedidos_por_estado as list of (label, count) for easy template iteration
+    pedidos_por_estado = [
+        (label, kpis['pedidos_por_estado'].get(estado, 0))
+        for estado, label in Pedido.ESTADO_CHOICES
+    ]
+
+    from datetime import timedelta
+    semana_desde = fecha - timedelta(days=6)
+    top_platos = platos_mas_vendidos(semana_desde, fecha, limit=5)
+    resumen_meseros = resumen_por_mesero(semana_desde, fecha)
+    ventas_semana = ventas_por_rango(semana_desde, fecha)
+
+    return render(request, 'orders/reporte_ventas.html', {
+        'fecha': fecha,
+        'kpis': kpis,
+        'pedidos_por_estado': pedidos_por_estado,
+        'top_platos': top_platos,
+        'resumen_meseros': resumen_meseros,
+        'ventas_semana': ventas_semana,
+        'semana_desde': semana_desde,
     })

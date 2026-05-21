@@ -17,4 +17,5 @@ urlpatterns = [
     path('historial/', views.historial_pedidos, name='historial_pedidos'),
     path('<int:pk>/', views.detalle_pedido, name='detalle_pedido'),
     path('<int:pk>/estado/', views.cambiar_estado_pedido, name='cambiar_estado_pedido'),
+    path('reporte/ventas/', views.reporte_ventas_diarias, name='reporte_ventas'),
 ]
