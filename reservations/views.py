@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -62,18 +63,22 @@ def cancelar_reserva(request, pk):
 @mesero_required
 def lista_reservas(request):
     form = FiltroReservaForm(request.GET or None)
-    reservas = Reserva.objects.select_related('cliente', 'mesa').all()
+    qs = Reserva.objects.select_related('cliente', 'mesa').all()
 
     if form.is_valid():
         if form.cleaned_data.get('fecha_desde'):
-            reservas = reservas.filter(fecha__gte=form.cleaned_data['fecha_desde'])
+            qs = qs.filter(fecha__gte=form.cleaned_data['fecha_desde'])
         if form.cleaned_data.get('fecha_hasta'):
-            reservas = reservas.filter(fecha__lte=form.cleaned_data['fecha_hasta'])
+            qs = qs.filter(fecha__lte=form.cleaned_data['fecha_hasta'])
         if form.cleaned_data.get('estado'):
-            reservas = reservas.filter(estado=form.cleaned_data['estado'])
+            qs = qs.filter(estado=form.cleaned_data['estado'])
+
+    paginator = Paginator(qs, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'reservations/lista_reservas.html', {
-        'reservas': reservas,
+        'reservas': page_obj,
+        'page_obj': page_obj,
         'form': form,
     })
 
@@ -174,6 +179,7 @@ def disponibilidad_mesas(request):
                 'numero': m.numero,
                 'capacidad': m.capacidad,
                 'ubicacion': m.get_ubicacion_display(),
+                'ubicacion_slug': m.ubicacion,
             }
             for m in mesas
         ]

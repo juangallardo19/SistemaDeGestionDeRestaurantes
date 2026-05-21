@@ -59,3 +59,43 @@ class AsignarMeseroForm(forms.ModelForm):
     class Meta:
         model = Pedido
         fields = ['mesero']
+
+
+class FiltroPedidoForm(forms.Form):
+    fecha_desde = forms.DateField(
+        required=False,
+        label='Fecha desde',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+    )
+    fecha_hasta = forms.DateField(
+        required=False,
+        label='Fecha hasta',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+    )
+    estado = forms.ChoiceField(
+        required=False,
+        label='Estado',
+        choices=[('', '— Todos —')] + Pedido.ESTADO_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+    mesero = forms.ModelChoiceField(
+        required=False,
+        label='Mesero',
+        queryset=CustomUser.objects.filter(role='mesero'),
+        empty_label='— Todos —',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+    cliente = forms.CharField(
+        required=False,
+        label='Cliente',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombre o email...',
+        }),
+    )
+    metodo_pago = forms.ChoiceField(
+        required=False,
+        label='Método de pago',
+        choices=[('', '— Todos —')] + Pedido.METODO_PAGO_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )

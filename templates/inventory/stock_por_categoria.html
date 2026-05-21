@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock por Categoría — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-diagram-3 fs-4 text-primary-warm"></i>
+      <h2 class="mb-0">Stock por Categoría</h2>
+    </div>
+    <a href="{% url 'inventory:list' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-boxes me-1"></i>Inventario
+    </a>
+  </div>
+
+  <p class="text-muted small mb-4">
+    <i class="bi bi-calendar-range me-1"></i>
+    Período analizado: {{ fecha_desde|date:"d/m/Y" }} — {{ fecha_hasta|date:"d/m/Y" }} (últimos 30 días)
+  </p>
+
+  <!-- Consumo por categoría -->
+  <h5 class="fw-semibold mb-3">
+    <i class="bi bi-bar-chart me-2 text-primary-warm"></i>Ventas por categoría
+  </h5>
+
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden mb-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="px-4 py-3">Categoría</th>
+              <th class="text-center">Porciones vendidas</th>
+              <th class="text-end pe-4">Ingresos</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in consumo_por_categoria %}
+            <tr>
+              <td class="px-4 fw-semibold">{{ cat.plato__categoria__nombre|default:"Sin categoría" }}</td>
+              <td class="text-center">{{ cat.total_porciones }}</td>
+              <td class="text-end pe-4 text-success fw-semibold">
+                ${{ cat.ingresos|floatformat:2|default:"0.00" }}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                Sin datos de ventas en los últimos 30 días.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consumo de ingredientes por categoría -->
+  <h5 class="fw-semibold mb-3">
+    <i class="bi bi-boxes me-2 text-primary-warm"></i>Consumo de ingredientes por categoría
+  </h5>
+
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden mb-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="px-4 py-3">Categoría</th>
+              <th>Ingrediente</th>
+              <th class="text-center">Unidad</th>
+              <th class="text-end">Consumido</th>
+              <th class="text-end">Stock actual</th>
+              <th class="text-center pe-4">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in ingredientes_consumidos %}
+            <tr>
+              <td class="px-4 text-muted small">{{ row.plato__categoria__nombre|default:"Sin categoría" }}</td>
+              <td class="fw-medium">{{ row.ingrediente__nombre }}</td>
+              <td class="text-center text-muted small">{{ row.ingrediente__unidad_medida }}</td>
+              <td class="text-end fw-semibold text-danger">
+                {{ row.cantidad_consumida|floatformat:2 }}
+              </td>
+              <td class="text-end">{{ row.ingrediente__stock_actual }}</td>
+              <td class="text-center pe-4">
+                {% if row.ingrediente__stock_actual <= row.ingrediente__stock_minimo %}
+                  <span class="badge-estado estado-cancelado">
+                    <i class="bi bi-exclamation-circle me-1"></i>Bajo
+                  </span>
+                {% else %}
+                  <span class="badge-estado estado-listo">
+                    <i class="bi bi-check-circle me-1"></i>OK
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                Sin datos de consumo de ingredientes en los últimos 30 días.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
