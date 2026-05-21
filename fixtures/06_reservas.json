@@ -1,0 +1,152 @@
+[
+  {
+    "model": "reservations.reserva",
+    "pk": 1,
+    "fields": {
+      "cliente": 4,
+      "mesa": 2,
+      "fecha": "2026-03-15",
+      "hora_inicio": "19:00:00",
+      "hora_fin": "21:00:00",
+      "numero_personas": 2,
+      "estado": "completada",
+      "notas": "",
+      "fecha_creacion": "2026-03-14T10:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 2,
+    "fields": {
+      "cliente": 5,
+      "mesa": 4,
+      "fecha": "2026-03-22",
+      "hora_inicio": "20:00:00",
+      "hora_fin": "22:00:00",
+      "numero_personas": 4,
+      "estado": "completada",
+      "notas": "Mesa de cumpleaños",
+      "fecha_creacion": "2026-03-20T15:30:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 3,
+    "fields": {
+      "cliente": 6,
+      "mesa": 1,
+      "fecha": "2026-04-05",
+      "hora_inicio": "13:00:00",
+      "hora_fin": "15:00:00",
+      "numero_personas": 2,
+      "estado": "completada",
+      "notas": "",
+      "fecha_creacion": "2026-04-04T09:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 4,
+    "fields": {
+      "cliente": 4,
+      "mesa": 5,
+      "fecha": "2026-04-18",
+      "hora_inicio": "19:30:00",
+      "hora_fin": "21:30:00",
+      "numero_personas": 5,
+      "estado": "completada",
+      "notas": "Reunión de empresa, necesitamos menú ejecutivo",
+      "fecha_creacion": "2026-04-16T11:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 5,
+    "fields": {
+      "cliente": 5,
+      "mesa": 3,
+      "fecha": "2026-05-02",
+      "hora_inicio": "20:00:00",
+      "hora_fin": "22:00:00",
+      "numero_personas": 3,
+      "estado": "completada",
+      "notas": "",
+      "fecha_creacion": "2026-05-01T16:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 6,
+    "fields": {
+      "cliente": 6,
+      "mesa": 8,
+      "fecha": "2026-05-10",
+      "hora_inicio": "13:00:00",
+      "hora_fin": "14:30:00",
+      "numero_personas": 2,
+      "estado": "completada",
+      "notas": "Almuerzo de aniversario",
+      "fecha_creacion": "2026-05-09T10:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 7,
+    "fields": {
+      "cliente": 4,
+      "mesa": 6,
+      "fecha": "2026-05-15",
+      "hora_inicio": "19:00:00",
+      "hora_fin": "21:00:00",
+      "numero_personas": 6,
+      "estado": "completada",
+      "notas": "Celebración familiar",
+      "fecha_creacion": "2026-05-13T14:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 8,
+    "fields": {
+      "cliente": 5,
+      "mesa": 2,
+      "fecha": "2026-05-24",
+      "hora_inicio": "19:00:00",
+      "hora_fin": "21:00:00",
+      "numero_personas": 2,
+      "estado": "confirmada",
+      "notas": "",
+      "fecha_creacion": "2026-05-20T10:00:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 9,
+    "fields": {
+      "cliente": 6,
+      "mesa": 4,
+      "fecha": "2026-05-28",
+      "hora_inicio": "20:00:00",
+      "hora_fin": "22:00:00",
+      "numero_personas": 4,
+      "estado": "confirmada",
+      "notas": "Mesa con vista a la terraza preferiblemente",
+      "fecha_creacion": "2026-05-21T09:30:00Z"
+    }
+  },
+  {
+    "model": "reservations.reserva",
+    "pk": 10,
+    "fields": {
+      "cliente": 4,
+      "mesa": 3,
+      "fecha": "2026-06-01",
+      "hora_inicio": "13:00:00",
+      "hora_fin": "15:00:00",
+      "numero_personas": 3,
+      "estado": "pendiente",
+      "notas": "",
+      "fecha_creacion": "2026-05-21T11:00:00Z"
+    }
+  }
+]

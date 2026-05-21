@@ -1,0 +1,128 @@
+[
+  {
+    "model": "accounts.customuser",
+    "pk": 1,
+    "fields": {
+      "username": "admin1",
+      "password": "!Demo1234!",
+      "email": "admin@restaurapp.co",
+      "first_name": "Admin",
+      "last_name": "General",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "date_joined": "2026-01-01T10:00:00Z",
+      "last_login": null,
+      "role": "admin",
+      "phone": null,
+      "profile_picture": "",
+      "groups": [3],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 2,
+    "fields": {
+      "username": "mesero1",
+      "password": "!Demo1234!",
+      "email": "carlos.ramirez@restaurapp.co",
+      "first_name": "Carlos",
+      "last_name": "Ramírez",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2026-01-05T10:00:00Z",
+      "last_login": null,
+      "role": "mesero",
+      "phone": "3101234567",
+      "profile_picture": "",
+      "groups": [2],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 3,
+    "fields": {
+      "username": "mesero2",
+      "password": "!Demo1234!",
+      "email": "ana.gomez@restaurapp.co",
+      "first_name": "Ana",
+      "last_name": "Gómez",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2026-01-05T11:00:00Z",
+      "last_login": null,
+      "role": "mesero",
+      "phone": "3207654321",
+      "profile_picture": "",
+      "groups": [2],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 4,
+    "fields": {
+      "username": "cliente1",
+      "password": "!Demo1234!",
+      "email": "juan.perez@email.co",
+      "first_name": "Juan",
+      "last_name": "Pérez",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2026-01-10T09:00:00Z",
+      "last_login": null,
+      "role": "cliente",
+      "phone": "3154441122",
+      "profile_picture": "",
+      "groups": [1],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 5,
+    "fields": {
+      "username": "cliente2",
+      "password": "!Demo1234!",
+      "email": "maria.lopez@email.co",
+      "first_name": "María",
+      "last_name": "López",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2026-01-12T14:00:00Z",
+      "last_login": null,
+      "role": "cliente",
+      "phone": null,
+      "profile_picture": "",
+      "groups": [1],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 6,
+    "fields": {
+      "username": "cliente3",
+      "password": "!Demo1234!",
+      "email": "luis.torres@email.co",
+      "first_name": "Luis",
+      "last_name": "Torres",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2026-01-15T16:00:00Z",
+      "last_login": null,
+      "role": "cliente",
+      "phone": null,
+      "profile_picture": "",
+      "groups": [1],
+      "user_permissions": []
+    }
+  }
+]
