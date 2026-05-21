@@ -3,73 +3,90 @@
 {% block title %}Historial de movimientos — RestaurApp{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4">
+<div class="container-fluid px-2 px-md-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de movimientos</h2>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-clock-history fs-4 text-primary-warm"></i>
+      <h2 class="mb-0">Historial de Movimientos</h2>
+    </div>
     <div class="d-flex gap-2">
-      <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>Volver al inventario
+      <a href="{% url 'inventory:list' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-boxes me-1"></i>Inventario
       </a>
-      <a href="{% url 'inventory:registrar_movimiento' %}" class="btn btn-primary btn-sm">
+      <a href="{% url 'inventory:registrar_movimiento' %}" class="btn btn-primary-custom btn-sm">
         <i class="bi bi-plus-circle me-1"></i>Nuevo movimiento
       </a>
     </div>
   </div>
 
   <!-- Filtros -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-body">
-      <form method="GET" class="row g-3 align-items-end">
-        <div class="col-sm-4">
-          <label class="form-label fw-semibold">Ingrediente</label>
-          <select name="ingrediente" class="form-select">
+  <div class="card shadow-sm border-0 rounded-3 mb-4">
+    <div class="card-body px-4 py-3">
+      <form method="get" class="row g-3 align-items-end">
+
+        <div class="col-sm-4 col-md-3">
+          <label class="form-label fw-semibold small">Ingrediente</label>
+          <select name="ingrediente" class="form-select form-select-sm">
             <option value="">— Todos —</option>
             {% for ing in ingredientes %}
-            <option value="{{ ing.pk }}" {% if ingrediente_id == ing.pk|stringformat:'s' %}selected{% endif %}>
+            <option value="{{ ing.pk }}"
+              {% if ingrediente_id == ing.pk|stringformat:'s' %}selected{% endif %}>
               {{ ing.nombre }}
             </option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-sm-3">
-          <label class="form-label fw-semibold">Tipo</label>
-          <select name="tipo" class="form-select">
+
+        <div class="col-sm-4 col-md-2">
+          <label class="form-label fw-semibold small">Tipo</label>
+          <select name="tipo" class="form-select form-select-sm">
             <option value="">— Todos —</option>
             {% for value, label in tipo_choices %}
-            <option value="{{ value }}" {% if tipo_filtro == value %}selected{% endif %}>
+            <option value="{{ value }}"
+              {% if tipo_filtro == value %}selected{% endif %}>
               {{ label }}
             </option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-sm-3">
-          <label class="form-label fw-semibold">Fecha</label>
-          <input type="date" name="fecha" class="form-control" value="{{ fecha_filtro }}">
+
+        <div class="col-sm-4 col-md-2">
+          <label class="form-label fw-semibold small">Desde</label>
+          <input type="date" name="fecha_desde" class="form-control form-control-sm"
+                 value="{{ fecha_desde }}">
         </div>
-        <div class="col-sm-2 d-flex gap-2">
-          <button type="submit" class="btn btn-primary flex-grow-1">
+
+        <div class="col-sm-4 col-md-2">
+          <label class="form-label fw-semibold small">Hasta</label>
+          <input type="date" name="fecha_hasta" class="form-control form-control-sm"
+                 value="{{ fecha_hasta }}">
+        </div>
+
+        <div class="col-sm-4 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary-custom btn-sm flex-grow-1">
             <i class="bi bi-search me-1"></i>Filtrar
           </button>
-          {% if ingrediente_id or tipo_filtro or fecha_filtro %}
-          <a href="{% url 'inventory:historial' %}" class="btn btn-outline-secondary">
+          {% if ingrediente_id or tipo_filtro or fecha_desde or fecha_hasta %}
+          <a href="{% url 'inventory:historial' %}" class="btn btn-sm btn-outline-secondary" title="Limpiar filtros">
             <i class="bi bi-x-circle"></i>
           </a>
           {% endif %}
         </div>
+
       </form>
     </div>
   </div>
 
-  <!-- Tabla de movimientos -->
   {% if movimientos %}
-  <div class="card shadow-sm">
+
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-          <thead class="table-dark">
+          <thead class="table-light">
             <tr>
-              <th>Fecha</th>
+              <th class="px-4 py-3">Fecha</th>
               <th>Ingrediente</th>
               <th class="text-center">Tipo</th>
               <th class="text-end">Cantidad</th>
@@ -81,33 +98,52 @@
           <tbody>
             {% for mov in movimientos %}
             <tr>
-              <td class="small">
-                {{ mov.fecha|date:"d/m/Y" }}<br>
-                <span class="text-muted">{{ mov.fecha|time:"H:i" }}</span>
+              <!-- Fecha -->
+              <td class="px-4 py-3">
+                <span class="d-block fw-medium">{{ mov.fecha|date:"d/m/Y" }}</span>
+                <small class="text-muted">{{ mov.fecha|time:"H:i" }}</small>
               </td>
-              <td class="fw-semibold">
+
+              <!-- Ingrediente -->
+              <td>
                 <a href="{% url 'inventory:detalle_ingrediente' mov.ingrediente.pk %}"
-                   class="text-decoration-none">
+                   class="fw-semibold text-decoration-none d-block lh-sm">
                   {{ mov.ingrediente.nombre }}
                 </a>
-                <div class="text-muted small">{{ mov.ingrediente.unidad_medida }}</div>
+                <small class="text-muted">{{ mov.ingrediente.unidad_medida }}</small>
               </td>
+
+              <!-- Tipo con badge -->
               <td class="text-center">
                 {% if mov.tipo == 'entrada' %}
-                <span class="badge bg-success"><i class="bi bi-plus-circle me-1"></i>Entrada</span>
+                  <span class="badge-estado estado-listo">
+                    <i class="bi bi-plus-circle me-1"></i>Entrada
+                  </span>
                 {% elif mov.tipo == 'salida' %}
-                <span class="badge bg-danger"><i class="bi bi-dash-circle me-1"></i>Salida</span>
+                  <span class="badge-estado estado-cancelado">
+                    <i class="bi bi-dash-circle me-1"></i>Salida
+                  </span>
                 {% else %}
-                <span class="badge bg-warning text-dark"><i class="bi bi-arrow-repeat me-1"></i>Ajuste</span>
+                  <span class="badge-estado estado-pendiente">
+                    <i class="bi bi-arrow-repeat me-1"></i>Ajuste
+                  </span>
                 {% endif %}
               </td>
+
+              <!-- Cantidad con signo -->
               <td class="text-end fw-semibold
                           {% if mov.tipo == 'entrada' %}text-success
                           {% elif mov.tipo == 'salida' %}text-danger{% endif %}">
-                {% if mov.tipo == 'entrada' %}+{% elif mov.tipo == 'salida' %}-{% endif %}{{ mov.cantidad }}
+                {% if mov.tipo == 'entrada' %}+{% elif mov.tipo == 'salida' %}&minus;{% endif %}{{ mov.cantidad }}
               </td>
+
+              <!-- Stock resultante -->
               <td class="text-end text-muted">{{ mov.stock_resultante }}</td>
+
+              <!-- Responsable -->
               <td class="small">{{ mov.responsable.get_full_name|default:mov.responsable.username }}</td>
+
+              <!-- Motivo -->
               <td class="text-muted small">{{ mov.motivo|default:"—"|truncatewords:8 }}</td>
             </tr>
             {% endfor %}
@@ -118,13 +154,19 @@
   </div>
 
   {% else %}
-  <div class="text-center py-5 text-muted">
-    <i class="bi bi-search display-1"></i>
-    <p class="mt-3 fs-5">No se encontraron movimientos con los filtros aplicados.</p>
-    <a href="{% url 'inventory:historial' %}" class="btn btn-outline-secondary mt-2">
-      <i class="bi bi-x-circle me-1"></i>Limpiar filtros
-    </a>
+
+  <div class="row justify-content-center">
+    <div class="col-md-5 text-center py-5">
+      <i class="bi bi-search" style="font-size:4rem;color:var(--color-primary);opacity:.2;"></i>
+      <p class="mt-3 fs-5 fw-semibold">No se encontraron movimientos.</p>
+      {% if ingrediente_id or tipo_filtro or fecha_desde or fecha_hasta %}
+      <a href="{% url 'inventory:historial' %}" class="btn btn-outline-secondary mt-2">
+        <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+      </a>
+      {% endif %}
+    </div>
   </div>
+
   {% endif %}
 
 </div>
