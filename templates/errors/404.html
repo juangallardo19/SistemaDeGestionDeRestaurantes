@@ -1,27 +1,73 @@
 {% extends 'base.html' %}
 
-{% block title %}Página no encontrada (404){% endblock %}
+{% block title %}404 — Página no encontrada | RestaurApp{% endblock %}
 
 {% block content %}
-<div class="error-page" role="main">
+<div class="error-page">
     <div class="error-card">
+
         <div class="error-illustration" aria-hidden="true">
             <span class="error-code">404</span>
-            <i class="fa-solid fa-plate-wheat error-icon"></i>
+            <svg width="160" height="150" viewBox="0 0 160 150" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" focusable="false">
+
+                <!-- Sombra -->
+                <ellipse cx="92" cy="142" rx="44" ry="7" fill="rgba(74,47,26,0.09)"/>
+
+                <!-- Plato -->
+                <circle cx="92" cy="96" r="44"
+                        fill="var(--color-cream,#FAF3E8)"
+                        stroke="var(--color-border,#DDD0C0)" stroke-width="2.5"/>
+                <!-- Aro interior -->
+                <circle cx="92" cy="96" r="32"
+                        fill="none"
+                        stroke="var(--color-border,#DDD0C0)" stroke-width="1.5"/>
+
+                <!-- Tenedor — mango -->
+                <rect x="28" y="72" width="7" height="36" rx="3.5"
+                      fill="var(--color-brown-light,#7A5230)"/>
+                <!-- Tenedor — cuello -->
+                <line x1="31.5" y1="72" x2="31.5" y2="58"
+                      stroke="var(--color-brown-light,#7A5230)" stroke-width="5"
+                      stroke-linecap="round"/>
+                <!-- Tenedor — tres púas -->
+                <line x1="26" y1="44" x2="26" y2="59"
+                      stroke="var(--color-brown-light,#7A5230)" stroke-width="2.2"
+                      stroke-linecap="round"/>
+                <line x1="31.5" y1="42" x2="31.5" y2="59"
+                      stroke="var(--color-brown-light,#7A5230)" stroke-width="2.2"
+                      stroke-linecap="round"/>
+                <line x1="37" y1="44" x2="37" y2="59"
+                      stroke="var(--color-brown-light,#7A5230)" stroke-width="2.2"
+                      stroke-linecap="round"/>
+
+                <!-- Signo de interrogación — arco -->
+                <path d="M82 88
+                         C82 80 88 75 92 74
+                         C97 72 104 75 104 81
+                         C104 87 98 90 92 94
+                         L92 102"
+                      stroke="var(--color-primary,#D4700A)"
+                      stroke-width="5.5" stroke-linecap="round" fill="none"/>
+                <!-- Signo de interrogación — punto -->
+                <circle cx="92" cy="112" r="3.5" fill="var(--color-primary,#D4700A)"/>
+            </svg>
         </div>
-        <h1 class="error-title">Esta mesa no existe</h1>
+
+        <h1 class="error-title">Esta página no existe en nuestro menú</h1>
         <p class="error-description">
-            La página que buscas no está disponible. Tal vez el plato ya fue retirado del menú,
-            o la dirección que escribiste no es correcta.
+            Parece que el plato que buscás no está disponible hoy.
+            Quizás fue retirado del menú o la dirección es incorrecta.
         </p>
         <div class="error-actions">
-            <a href="/" class="btn btn-primary-custom">
+            <a href="/" class="btn-primary-custom">
                 <i class="fa-solid fa-house me-2" aria-hidden="true"></i>Volver al inicio
             </a>
-            <a href="{% url 'menu:list' %}" class="btn btn-outline-custom">
+            <a href="/menu/" class="btn-outline-custom">
                 <i class="fa-solid fa-book-open me-2" aria-hidden="true"></i>Ver el menú
             </a>
         </div>
+
     </div>
 </div>
 {% endblock %}
