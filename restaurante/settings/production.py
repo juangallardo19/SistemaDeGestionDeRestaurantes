@@ -35,6 +35,14 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+# Si no hay credenciales de correo configuradas, usar consola para no bloquear workers
+if not config('EMAIL_HOST_USER', default=''):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_TIMEOUT = 5  # segundos máximos de espera SMTP — evita WORKER TIMEOUT en gunicorn
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

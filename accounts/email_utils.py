@@ -29,7 +29,7 @@ def send_confirmacion_pedido(pedido):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[pedido.cliente.email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
     except Exception:
         logger.exception('Error enviando confirmación del pedido #%s', pedido.pk)
@@ -58,7 +58,7 @@ def send_confirmacion_reserva(reserva):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[reserva.cliente.email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
     except Exception:
         logger.exception('Error enviando confirmación de reserva #%s', reserva.pk)
@@ -87,7 +87,7 @@ def send_reserva_confirmada(reserva):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[reserva.cliente.email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
     except Exception:
         logger.exception('Error enviando confirmación de reserva #%s', reserva.pk)
@@ -116,7 +116,7 @@ def send_cambio_estado_pedido(pedido, estado_anterior):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[pedido.cliente.email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
     except Exception:
         logger.exception('Error enviando cambio de estado del pedido #%s', pedido.pk)
@@ -165,7 +165,7 @@ def send_alerta_stock_bajo(ingrediente):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[admin_email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
     except Exception:
         logger.exception('Error enviando alerta de stock bajo para %s', ingrediente.nombre)
