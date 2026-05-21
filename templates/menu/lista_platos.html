@@ -1,0 +1,685 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if query %}Búsqueda: {{ query }}{% else %}Menú{% endif %} — RestaurApp{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Menu page layout ─────────────────────────────────── */
+.menu-layout {
+    display: grid;
+    grid-template-columns: 1fr 272px;
+    gap: 1.5rem;
+    align-items: start;
+}
+@media (max-width: 991px) {
+    .menu-layout { grid-template-columns: 1fr; }
+    .mini-cart-aside { order: -1; }
+}
+
+/* ── Category pills ───────────────────────────────────── */
+.cat-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: .5rem;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+}
+.cat-pills::-webkit-scrollbar { display: none; }
+.cat-pill {
+    flex-shrink: 0;
+    padding: .3rem .9rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: .82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 150ms, border-color 150ms, color 150ms;
+}
+.cat-pill:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.cat-pill.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+/* ── Plato cards ──────────────────────────────────────── */
+.plato-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+.plato-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 150ms, box-shadow 150ms;
+}
+.plato-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 16px rgba(212,112,10,.07);
+}
+.plato-card-img {
+    width: 100%;
+    height: 155px;
+    object-fit: cover;
+}
+.plato-card-img-placeholder {
+    width: 100%;
+    height: 155px;
+    background: var(--color-cream-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 2rem;
+    opacity: .5;
+}
+.plato-card-body {
+    padding: .8rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+}
+.plato-cat-badge {
+    display: inline-block;
+    padding: .12rem .55rem;
+    background: var(--color-primary-pale);
+    color: var(--color-primary);
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 600;
+    align-self: flex-start;
+}
+.plato-name {
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.3;
+}
+.plato-desc {
+    font-size: .78rem;
+    color: var(--color-text-muted);
+    flex: 1;
+    margin: 0;
+}
+.plato-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: .4rem;
+}
+.plato-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+.plato-time {
+    font-size: .72rem;
+    color: var(--color-text-muted);
+}
+.plato-card-footer {
+    padding: .6rem .8rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: .4rem;
+    align-items: center;
+}
+.btn-detail {
+    flex: 1;
+    padding: .38rem .6rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: .78rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    transition: border-color 150ms, color 150ms;
+}
+.btn-detail:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.btn-add-cart {
+    padding: .38rem .65rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+}
+.btn-add-cart:hover { background: var(--color-primary-hover); color: #fff; }
+.btn-icon-sm {
+    padding: .38rem .55rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: .78rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 150ms, color 150ms;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-icon-sm:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.btn-icon-del:hover { border-color: #C0392B; color: #C0392B; }
+
+/* ── Mini cart sidebar ────────────────────────────────── */
+.mini-cart-aside { position: sticky; top: 80px; }
+.mini-cart-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+.mini-cart-header {
+    padding: .9rem 1.1rem .75rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.mini-cart-title {
+    font-weight: 700;
+    font-size: .9rem;
+    color: var(--color-text);
+}
+.mini-cart-count {
+    font-size: .74rem;
+    color: var(--color-text-muted);
+    background: var(--color-cream-dark);
+    padding: .12rem .55rem;
+    border-radius: 999px;
+    transition: background .2s;
+}
+.mini-cart-items {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: .15rem 0;
+}
+.mini-cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .55rem 1rem;
+    gap: .5rem;
+    font-size: .82rem;
+}
+.mini-cart-item + .mini-cart-item { border-top: 1px solid var(--color-border); }
+.mini-cart-item-name {
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: .2rem;
+    flex-shrink: 0;
+}
+.qty-btn {
+    width: 26px; height: 26px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 150ms, background 150ms;
+    line-height: 1;
+    padding: 0;
+}
+.qty-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.qty-input {
+    width: 36px;
+    height: 26px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: .82rem;
+    font-family: var(--font-body);
+    padding: 0 2px;
+}
+.qty-input:focus { outline: none; border-color: var(--color-primary); }
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.mini-cart-item-right {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    flex-shrink: 0;
+}
+.mini-cart-item-price {
+    color: var(--color-primary);
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: .8rem;
+    min-width: 48px;
+    text-align: right;
+}
+.btn-remove {
+    width: 22px; height: 22px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: .85rem;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: color 150ms, background 150ms;
+}
+.btn-remove:hover { color: #DC2626; background: rgba(220,38,38,.1); }
+.mini-cart-footer {
+    padding: .85rem 1.1rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+}
+.mini-cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: .875rem;
+    margin-bottom: .15rem;
+}
+.mini-cart-total strong { color: var(--color-primary); font-size: .95rem; }
+.btn-confirm {
+    display: block;
+    width: 100%;
+    padding: .6rem;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    text-decoration: none;
+    transition: background 150ms;
+}
+.btn-confirm:hover { background: var(--color-primary-hover); color: #fff; }
+.mini-cart-empty {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+}
+.mini-cart-empty i { font-size: 1.75rem; opacity: .3; display: block; margin-bottom: .6rem; }
+.mini-cart-empty p { margin: 0; font-size: .82rem; }
+.mini-cart-empty .hint { font-size: .75rem; opacity: .7; margin-top: .2rem; }
+@keyframes cart-flash { 0%,100%{background:var(--color-cream-dark)} 50%{background:rgba(212,112,10,.25)} }
+.cart-updated { animation: cart-flash .4s ease; }
+
+/* ── Search bar ───────────────────────────────────────── */
+.menu-search-row { display: flex; gap: .5rem; align-items: center; }
+.menu-search-input {
+    flex: 1;
+    padding: .5rem .9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: .875rem;
+    font-family: var(--font-body);
+}
+.menu-search-input:focus { outline: none; border-color: var(--color-primary); }
+.menu-search-btn {
+    padding: .5rem 1.1rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background 150ms;
+}
+.menu-search-btn:hover { background: var(--color-primary-hover); }
+.menu-clear-link {
+    padding: .5rem .9rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: .85rem;
+    text-decoration: none;
+    transition: border-color 150ms, color 150ms;
+}
+.menu-clear-link:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+/* ── Empty state ──────────────────────────────────────── */
+.menu-empty {
+    text-align: center;
+    padding: 3.5rem 2rem;
+    color: var(--color-text-muted);
+}
+.menu-empty i { font-size: 2.5rem; opacity: .25; display: block; margin-bottom: .75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+
+  <!-- Page header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0" style="font-family: var(--font-display);">
+      {% if query %}
+        Resultados para <em style="color: var(--color-primary);">"{{ query }}"</em>
+      {% else %}
+        Nuestro Menú
+      {% endif %}
+    </h1>
+    {% if user.is_admin %}
+    <a href="{% url 'menu:crear_plato' %}" class="btn-add-cart">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>Nuevo plato
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="menu-layout">
+
+    <!-- ── Main content ─────────────────────────────────── -->
+    <div>
+
+      <!-- Search -->
+      <form method="GET" action="{% url 'menu:buscar_platos' %}" class="mb-3">
+        {% if categoria_id %}
+        <input type="hidden" name="categoria" value="{{ categoria_id }}">
+        {% endif %}
+        <div class="menu-search-row">
+          <input type="text" name="q" class="menu-search-input"
+                 placeholder="Buscar plato…" value="{{ query }}">
+          <button class="menu-search-btn" type="submit">
+            <i class="fa-solid fa-magnifying-glass me-1" aria-hidden="true"></i>Buscar
+          </button>
+          {% if query %}
+          <a href="{% url 'menu:list' %}{% if categoria_id %}?categoria={{ categoria_id }}{% endif %}"
+             class="menu-clear-link">
+            <i class="fa-solid fa-xmark me-1" aria-hidden="true"></i>Limpiar
+          </a>
+          {% endif %}
+        </div>
+      </form>
+
+      <!-- Category pills -->
+      <div class="cat-pills mb-4">
+        <a class="cat-pill {% if not categoria_id %}active{% endif %}"
+           href="{% if query %}{% url 'menu:buscar_platos' %}?q={{ query }}{% else %}{% url 'menu:list' %}{% endif %}">
+          Todos
+        </a>
+        {% for cat in categorias %}
+        <a class="cat-pill {% if categoria_id == cat.pk %}active{% endif %}"
+           href="{% if query %}{% url 'menu:buscar_platos' %}?q={{ query }}&categoria={{ cat.pk }}{% else %}{% url 'menu:list' %}?categoria={{ cat.pk }}{% endif %}">
+          {{ cat.nombre }}
+        </a>
+        {% endfor %}
+      </div>
+
+      <!-- Cards -->
+      {% if platos %}
+      <div class="plato-grid">
+        {% for plato in platos %}
+        <div class="plato-card">
+
+          {% if plato.imagen %}
+          <img src="{{ plato.imagen.url }}" alt="{{ plato.nombre }}" class="plato-card-img">
+          {% else %}
+          <div class="plato-card-img-placeholder" aria-hidden="true">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          {% endif %}
+
+          <div class="plato-card-body">
+            <span class="plato-cat-badge">{{ plato.categoria.nombre }}</span>
+            <h3 class="plato-name mt-1">{{ plato.nombre }}</h3>
+            {% if plato.descripcion %}
+            <p class="plato-desc">{{ plato.descripcion|truncatewords:10 }}</p>
+            {% endif %}
+            <div class="plato-meta">
+              <span class="plato-price">${{ plato.precio }}</span>
+              <span class="plato-time">
+                <i class="fa-regular fa-clock me-1" aria-hidden="true"></i>{{ plato.tiempo_preparacion }} min
+              </span>
+            </div>
+          </div>
+
+          <div class="plato-card-footer">
+            <a href="{% url 'menu:detalle_plato' plato.pk %}" class="btn-detail">
+              Ver detalle
+            </a>
+            {% if plato.disponible %}
+              {% if user.is_cliente or user.is_admin or user.is_mesero %}
+              <button type="button" class="btn-add-cart js-add-cart"
+                      data-url="{% url 'orders:agregar_al_carrito' plato.pk %}"
+                      title="Agregar al carrito">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              </button>
+              {% endif %}
+            {% endif %}
+            {% if user.is_admin %}
+            <a href="{% url 'menu:editar_plato' plato.pk %}" class="btn-icon-sm" title="Editar">
+              <i class="fa-solid fa-pen" aria-hidden="true"></i>
+            </a>
+            <form method="POST" action="{% url 'menu:eliminar_plato' plato.pk %}"
+                  onsubmit="return confirm('¿Desactivar «{{ plato.nombre }}»?')">
+              {% csrf_token %}
+              <button type="submit" class="btn-icon-sm btn-icon-del" title="Desactivar">
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="menu-empty">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        {% if query %}
+          <p>No se encontraron platos para <strong>"{{ query }}"</strong>.</p>
+        {% else %}
+          <p>No hay platos disponibles en esta categoría.</p>
+        {% endif %}
+        <a href="{% url 'menu:list' %}" class="btn-detail d-inline-block mt-3"
+           style="padding: .5rem 1.5rem;">
+          Ver todo el menú
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+    <!-- ── End main content ──────────────────────────────── -->
+
+    <!-- ── Mini cart sidebar ────────────────────────────── -->
+    {% if user.is_cliente or user.is_admin or user.is_mesero %}
+    <aside class="mini-cart-aside">
+      <div class="mini-cart-panel" id="mini-cart-panel">
+        <div class="mini-cart-header">
+          <span class="mini-cart-title">
+            <i class="fa-solid fa-cart-shopping me-2" aria-hidden="true"></i>Tu pedido
+          </span>
+          <span class="mini-cart-count" id="mini-cart-count">{{ carrito|length }} uds.</span>
+        </div>
+        <div id="mini-cart-body">
+          {% include 'menu/_mini_cart_body.html' %}
+        </div>
+      </div>
+    </aside>
+    {% endif %}
+    <!-- ── End mini cart ─────────────────────────────────── -->
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CSRF    = '{{ csrf_token }}';
+  var URL_CONFIRM = '{% url "orders:crear_pedido" %}';
+
+  function urlRemov(id) { return '/orders/carrito/remover/' + id + '/'; }
+  function urlUpd(id)   { return '/orders/carrito/actualizar/' + id + '/'; }
+
+  function fmt(val) {
+    return '$' + Number(val).toLocaleString('es-CO', { maximumFractionDigits: 0 });
+  }
+
+  function cartPost(url, extraFields) {
+    var fd = new FormData();
+    fd.append('csrfmiddlewaretoken', CSRF);
+    if (extraFields) {
+      Object.keys(extraFields).forEach(function(k) { fd.append(k, extraFields[k]); });
+    }
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd
+    }).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  function renderCart(data) {
+    var body    = document.getElementById('mini-cart-body');
+    var countEl = document.getElementById('mini-cart-count');
+    if (!body) return;
+
+    if (countEl) {
+      countEl.textContent = data.count + ' uds.';
+      countEl.classList.remove('cart-updated');
+      void countEl.offsetWidth;
+      countEl.classList.add('cart-updated');
+    }
+
+    if (!data.count) {
+      body.innerHTML =
+        '<div class="mini-cart-empty">' +
+          '<i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>' +
+          '<p>Tu carrito está vacío</p>' +
+          '<p class="hint">Presioná <strong>+</strong> en cualquier plato</p>' +
+        '</div>';
+      return;
+    }
+
+    var rows = data.items.map(function(it) {
+      return '<div class="mini-cart-item" data-id="' + it.plato_id + '">' +
+        '<span class="mini-cart-item-name" title="' + it.nombre + '">' + it.nombre + '</span>' +
+        '<div class="qty-controls">' +
+          '<button type="button" class="qty-btn js-dec" data-id="' + it.plato_id + '">&#8722;</button>' +
+          '<input class="qty-input js-qty" type="number" min="1" max="20"' +
+                 ' value="' + it.cantidad + '" data-id="' + it.plato_id + '">' +
+          '<button type="button" class="qty-btn js-inc" data-id="' + it.plato_id + '">+</button>' +
+        '</div>' +
+        '<div class="mini-cart-item-right">' +
+          '<span class="mini-cart-item-price">' + fmt(it.subtotal) + '</span>' +
+          '<button type="button" class="btn-remove js-rem" data-id="' + it.plato_id + '" title="Quitar">' +
+            '<i class="fa-solid fa-xmark"></i>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    body.innerHTML =
+      '<div class="mini-cart-items">' + rows + '</div>' +
+      '<div class="mini-cart-footer">' +
+        '<div class="mini-cart-total"><span>Total</span><strong>' + fmt(data.total) + '</strong></div>' +
+        '<a href="' + URL_CONFIRM + '" class="btn-confirm">' +
+          '<i class="fa-solid fa-check me-1"></i>Confirmar pedido</a>' +
+      '</div>';
+
+    wireCart(body);
+  }
+
+  function wireCart(root) {
+    root.querySelectorAll('.js-dec').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id  = btn.dataset.id;
+        var inp = root.querySelector('.js-qty[data-id="' + id + '"]');
+        var cur = parseInt(inp ? inp.value : 1, 10);
+        if (cur <= 1) {
+          cartPost(urlRemov(id), {}).then(renderCart).catch(console.error);
+        } else {
+          var nq = cur - 1;
+          if (inp) inp.value = nq;
+          cartPost(urlUpd(id), { cantidad: nq, actualizar: '1' }).then(renderCart).catch(console.error);
+        }
+      });
+    });
+
+    root.querySelectorAll('.js-inc').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id  = btn.dataset.id;
+        var inp = root.querySelector('.js-qty[data-id="' + id + '"]');
+        var nq  = Math.min(20, parseInt(inp ? inp.value : 1, 10) + 1);
+        if (inp) inp.value = nq;
+        cartPost(urlUpd(id), { cantidad: nq, actualizar: '1' }).then(renderCart).catch(console.error);
+      });
+    });
+
+    root.querySelectorAll('.js-qty').forEach(function(inp) {
+      function commit() {
+        var id  = inp.dataset.id;
+        var qty = parseInt(inp.value, 10);
+        if (!qty || qty < 1) qty = 1;
+        if (qty > 20) qty = 20;
+        inp.value = qty;
+        cartPost(urlUpd(id), { cantidad: qty, actualizar: '1' }).then(renderCart).catch(console.error);
+      }
+      inp.addEventListener('change', commit);
+      inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+      });
+    });
+
+    root.querySelectorAll('.js-rem').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        cartPost(urlRemov(btn.dataset.id), {}).then(renderCart).catch(console.error);
+      });
+    });
+  }
+
+  // Botones "+" en las tarjetas de plato (agregar 1 unidad)
+  document.querySelectorAll('.js-add-cart').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      cartPost(btn.dataset.url, { cantidad: '1' })
+        .then(function(data) { renderCart(data); btn.disabled = false; })
+        .catch(function(err) { console.error(err); btn.disabled = false; });
+    });
+  });
+
+  // Activar controles en los ítems ya pintados por el servidor
+  var body = document.getElementById('mini-cart-body');
+  if (body) wireCart(body);
+
+})();
+</script>
+{% endblock %}

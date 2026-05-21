@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualización de pedido — RestaurApp</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background-color:#f4f4f4;padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               style="background-color:#ffffff;border-radius:8px;overflow:hidden;
+                      box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background-color:#1a1a2e;padding:28px 30px;text-align:center;">
+              <p style="margin:0;font-size:26px;font-weight:bold;color:#ffffff;
+                        letter-spacing:2px;">&#127869; RestaurApp</p>
+              <p style="margin:6px 0 0;font-size:13px;color:#aaaaaa;">
+                Sistema de Gestión de Restaurante
+              </p>
+            </td>
+          </tr>
+
+          <!-- TÍTULO -->
+          <tr>
+            <td style="background-color:#fff3e0;padding:20px 30px;text-align:center;
+                       border-bottom:3px solid #f57c00;">
+              <p style="margin:0;font-size:20px;font-weight:bold;color:#e65100;">
+                &#128260; Actualización de tu pedido #{{ pedido.pk }}
+              </p>
+            </td>
+          </tr>
+
+          <!-- CUERPO -->
+          <tr>
+            <td style="padding:30px;">
+
+              <p style="margin:0 0 24px;color:#444444;font-size:15px;">
+                Hola, <strong>{{ cliente.get_full_name|default:cliente.username }}</strong>.
+                El estado de tu pedido ha sido actualizado.
+              </p>
+
+              <!-- Cambio de estado visual -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="margin-bottom:28px;">
+                <tr>
+
+                  <!-- Estado anterior -->
+                  <td width="45%" align="center">
+                    <div style="padding:16px 12px;border-radius:8px;
+                                background-color:#f5f5f5;border:2px solid #e0e0e0;">
+                      <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                text-transform:uppercase;letter-spacing:1px;">
+                        Estado anterior
+                      </p>
+                      <p style="margin:0;font-size:15px;font-weight:bold;">
+                        {% if estado_anterior == 'pendiente' %}
+                        <span style="color:#f9a825;">Pendiente</span>
+                        {% elif estado_anterior == 'en_preparacion' %}
+                        <span style="color:#1565c0;">En preparación</span>
+                        {% elif estado_anterior == 'listo' %}
+                        <span style="color:#2e7d32;">Listo</span>
+                        {% elif estado_anterior == 'entregado' %}
+                        <span style="color:#546e7a;">Entregado</span>
+                        {% elif estado_anterior == 'cancelado' %}
+                        <span style="color:#c62828;">Cancelado</span>
+                        {% else %}
+                        <span style="color:#555555;">{{ estado_anterior|capfirst }}</span>
+                        {% endif %}
+                      </p>
+                    </div>
+                  </td>
+
+                  <!-- Flecha -->
+                  <td width="10%" align="center">
+                    <p style="margin:0;font-size:24px;color:#888888;">&#8594;</p>
+                  </td>
+
+                  <!-- Estado nuevo -->
+                  <td width="45%" align="center">
+                    <div style="padding:16px 12px;border-radius:8px;border:2px solid;">
+                      {% if estado_nuevo == 'pendiente' %}
+                      <div style="background-color:#fff8e1;border-color:#ffc107;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                  text-transform:uppercase;letter-spacing:1px;">
+                          Estado actual
+                        </p>
+                        <p style="margin:0;font-size:15px;font-weight:bold;color:#f9a825;">
+                          Pendiente
+                        </p>
+                      </div>
+                      {% elif estado_nuevo == 'en_preparacion' %}
+                      <div style="background-color:#e3f2fd;border-color:#1976d2;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                  text-transform:uppercase;letter-spacing:1px;">
+                          Estado actual
+                        </p>
+                        <p style="margin:0;font-size:15px;font-weight:bold;color:#1565c0;">
+                          En preparación
+                        </p>
+                      </div>
+                      {% elif estado_nuevo == 'listo' %}
+                      <div style="background-color:#e8f5e9;border-color:#388e3c;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                  text-transform:uppercase;letter-spacing:1px;">
+                          Estado actual
+                        </p>
+                        <p style="margin:0;font-size:15px;font-weight:bold;color:#2e7d32;">
+                          &#10003; Listo
+                        </p>
+                      </div>
+                      {% elif estado_nuevo == 'entregado' %}
+                      <div style="background-color:#f5f5f5;border-color:#78909c;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                  text-transform:uppercase;letter-spacing:1px;">
+                          Estado actual
+                        </p>
+                        <p style="margin:0;font-size:15px;font-weight:bold;color:#546e7a;">
+                          Entregado
+                        </p>
+                      </div>
+                      {% elif estado_nuevo == 'cancelado' %}
+                      <div style="background-color:#ffebee;border-color:#d32f2f;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#999999;
+                                  text-transform:uppercase;letter-spacing:1px;">
+                          Estado actual
+                        </p>
+                        <p style="margin:0;font-size:15px;font-weight:bold;color:#c62828;">
+                          Cancelado
+                        </p>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </td>
+
+                </tr>
+              </table>
+
+              <!-- Info del pedido -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background-color:#f8f9fa;border-radius:6px;
+                            border:1px solid #e0e0e0;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:12px 16px;color:#666666;font-size:13px;
+                             border-bottom:1px solid #e0e0e0;">
+                    NÚMERO DE PEDIDO
+                  </td>
+                  <td style="padding:12px 16px;text-align:right;font-weight:bold;
+                             color:#1a1a2e;border-bottom:1px solid #e0e0e0;">
+                    #{{ pedido.pk }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;color:#666666;font-size:13px;">
+                    TOTAL
+                  </td>
+                  <td style="padding:12px 16px;text-align:right;font-weight:bold;
+                             color:#333333;">
+                    ${{ pedido.total }}
+                  </td>
+                </tr>
+              </table>
+
+              {% if estado_nuevo == 'listo' %}
+              <div style="padding:14px 16px;background-color:#e8f5e9;border-radius:6px;
+                          border-left:4px solid #28a745;">
+                <p style="margin:0;color:#1b5e20;font-size:14px;">
+                  &#127860; <strong>¡Tu pedido está listo!</strong>
+                  En breve nuestro mesero se acercará a tu mesa.
+                </p>
+              </div>
+              {% elif estado_nuevo == 'en_preparacion' %}
+              <div style="padding:14px 16px;background-color:#e3f2fd;border-radius:6px;
+                          border-left:4px solid #1976d2;">
+                <p style="margin:0;color:#0d47a1;font-size:14px;">
+                  &#128293; Tu pedido está siendo preparado en cocina.
+                  ¡En breve estará listo!
+                </p>
+              </div>
+              {% endif %}
+
+              <p style="margin:24px 0 0;color:#777777;font-size:13px;">
+                Gracias por tu paciencia. ¡Disfruta tu comida!
+              </p>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background-color:#f8f9fa;padding:18px 30px;
+                       text-align:center;border-top:1px solid #e0e0e0;">
+              <p style="margin:0;color:#999999;font-size:12px;">
+                Este correo fue generado automáticamente por RestaurApp.<br>
+                Por favor no respondas este mensaje.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

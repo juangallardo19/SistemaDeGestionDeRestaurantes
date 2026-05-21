@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RestaurApp — Sistema de Gestión de Restaurante. Administrá pedidos, reservas, menú e inventario desde un solo lugar.">
+    <title>{% block title %}RestaurApp{% endblock %}</title>
+
+    <!-- Anti-FOUC: aplica el tema guardado antes de que Bootstrap renderice -->
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', t);
+        })();
+    </script>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Bootstrap Icons (compatibilidad con templates existentes) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+{% include 'partials/navbar.html' %}
+
+{% include 'partials/messages.html' %}
+
+<main class="page-content" id="main-content">
+    <div class="container-fluid py-5">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand-area">
+            <span class="footer-brand">
+                <i class="fa-solid fa-utensils" aria-hidden="true"></i>RestaurApp
+            </span>
+            <p class="footer-tagline">Sistema de Gestión de Restaurante</p>
+        </div>
+        <p class="footer-copy">
+            &copy; {% now "Y" %} RestaurApp &mdash; Todos los derechos reservados
+        </p>
+    </div>
+</footer>
+
+{% include 'partials/confirm_modal.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

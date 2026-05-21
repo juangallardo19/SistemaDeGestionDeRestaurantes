@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis pedidos — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-bag-heart fs-4 text-primary-warm"></i>
+      <h2 class="mb-0">Mis Pedidos</h2>
+    </div>
+    <a href="{% url 'menu:list' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-plus me-1"></i>Nuevo pedido
+    </a>
+  </div>
+
+  <!-- Filtro por estado -->
+  <div class="mb-4 overflow-auto">
+    <ul class="nav nav-pills flex-nowrap gap-1 pb-1">
+      <li class="nav-item">
+        <a class="nav-link {% if not estado_filtro %}active{% endif %}"
+           href="{% url 'orders:mis_pedidos' %}">
+          Todos
+        </a>
+      </li>
+      {% for value, label in estado_choices %}
+      <li class="nav-item">
+        <a class="nav-link {% if estado_filtro == value %}active{% endif %}"
+           href="{% url 'orders:mis_pedidos' %}?estado={{ value }}">
+          {{ label }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% if pedidos %}
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="px-4 py-3">Pedido</th>
+              <th>Fecha</th>
+              <th class="text-center">Ítems</th>
+              <th>Pago</th>
+              <th class="text-end">Total</th>
+              <th class="text-center">Estado</th>
+              <th class="pe-4" style="width:80px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+              <td class="px-4 fw-semibold">#{{ pedido.pk }}</td>
+              <td class="text-muted small">{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</td>
+              <td class="text-center text-muted">{{ pedido.detalles.count }}</td>
+              <td class="small text-muted">{{ pedido.get_metodo_pago_display }}</td>
+              <td class="text-end fw-semibold text-primary-warm">${{ pedido.total }}</td>
+              <td class="text-center">
+                <span class="badge-estado estado-{{ pedido.estado }}">
+                  {{ pedido.get_estado_display }}
+                </span>
+              </td>
+              <td class="pe-4">
+                <a href="{% url 'orders:detalle_pedido' pedido.pk %}"
+                   class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye me-1"></i>Ver
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="row justify-content-center">
+    <div class="col-md-5 text-center py-5">
+      <i class="bi bi-bag-x" style="font-size:4rem;color:var(--color-primary);opacity:.2;"></i>
+      <p class="mt-3 fs-5 fw-semibold">
+        {% if estado_filtro %}
+          No hay pedidos en estado "{{ estado_filtro }}".
+        {% else %}
+          Todavía no realizaste ningún pedido.
+        {% endif %}
+      </p>
+      <p class="text-muted mb-4">Explorá el menú y hacé tu primer pedido.</p>
+      <a href="{% url 'menu:list' %}" class="btn btn-primary-custom">
+        <i class="bi bi-journal-text me-2"></i>Ver el menú
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

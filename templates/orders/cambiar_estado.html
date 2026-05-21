@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cambiar estado — Pedido #{{ pedido.pk }} — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 520px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'orders:list' %}">Pedidos activos</a></li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'orders:detalle_pedido' pedido.pk %}">Pedido #{{ pedido.pk }}</a>
+      </li>
+      <li class="breadcrumb-item active">Cambiar estado</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="bi bi-arrow-repeat me-2"></i>Cambiar estado del pedido #{{ pedido.pk }}
+      </h4>
+    </div>
+    <div class="card-body">
+
+      <!-- Estado actual -->
+      <div class="mb-4 text-center">
+        <p class="text-muted mb-1">Estado actual</p>
+        <span class="fs-5">
+          {% include 'orders/_badge_estado.html' with estado=pedido.estado label=pedido.get_estado_display %}
+        </span>
+      </div>
+
+      <!-- Info del pedido -->
+      <div class="mb-4 p-3 bg-body-secondary rounded small text-muted">
+        <div><i class="bi bi-person me-1"></i><strong>Cliente:</strong> {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</div>
+        <div><i class="bi bi-clock me-1"></i><strong>Creado:</strong> {{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</div>
+        <div><i class="bi bi-bag me-1"></i><strong>Ítems:</strong> {{ pedido.detalles.all|length }}</div>
+        <div><i class="bi bi-currency-dollar me-1"></i><strong>Total:</strong> ${{ pedido.total }}</div>
+      </div>
+
+      <!-- Formulario de cambio de estado -->
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="d-flex gap-2 mt-4">
+          <a href="{% url 'orders:detalle_pedido' pedido.pk %}" class="btn btn-outline-secondary flex-grow-1">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary flex-grow-1">
+            <i class="bi bi-check-circle me-1"></i>Guardar cambio
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

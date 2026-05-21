@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}500 — Error del servidor | RestaurApp{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-card">
+
+        <div class="error-illustration" aria-hidden="true">
+            <span class="error-code">500</span>
+            <svg width="160" height="158" viewBox="0 0 160 158" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" focusable="false">
+
+                <!-- Humo — tres volutas -->
+                <path d="M56 48 C54 42 58 36 56 30 C54 24 58 18 56 13"
+                      stroke="var(--color-text-muted,#B8946A)" stroke-width="2.5"
+                      stroke-linecap="round" fill="none" opacity="0.55"/>
+                <path d="M80 44 C77 38 81 32 79 25 C77 19 81 13 79 7"
+                      stroke="var(--color-text-muted,#B8946A)" stroke-width="2.5"
+                      stroke-linecap="round" fill="none" opacity="0.7"/>
+                <path d="M104 48 C102 42 106 36 104 30 C102 24 106 18 104 13"
+                      stroke="var(--color-text-muted,#B8946A)" stroke-width="2.5"
+                      stroke-linecap="round" fill="none" opacity="0.55"/>
+
+                <!-- Sombra -->
+                <ellipse cx="80" cy="150" rx="44" ry="7" fill="rgba(74,47,26,0.09)"/>
+
+                <!-- Cuerpo de la olla -->
+                <path d="M34 72 L34 122 Q34 132 44 132 L116 132 Q126 132 126 122 L126 72 Z"
+                      fill="var(--color-primary,#D4700A)"
+                      stroke="var(--color-primary-hover,#B85D08)" stroke-width="2"/>
+
+                <!-- Tapa -->
+                <ellipse cx="80" cy="72" rx="46" ry="11"
+                         fill="var(--color-primary-hover,#B85D08)"
+                         stroke="var(--color-brown,#4A2F1A)" stroke-width="1.5"/>
+
+                <!-- Perilla de la tapa -->
+                <rect x="71" y="61" width="18" height="12" rx="6"
+                      fill="var(--color-brown,#4A2F1A)"/>
+
+                <!-- Asa izquierda -->
+                <path d="M34 82 Q16 82 16 98 Q16 114 34 114"
+                      stroke="var(--color-brown,#4A2F1A)" stroke-width="6.5"
+                      stroke-linecap="round" fill="none"/>
+
+                <!-- Asa derecha -->
+                <path d="M126 82 Q144 82 144 98 Q144 114 126 114"
+                      stroke="var(--color-brown,#4A2F1A)" stroke-width="6.5"
+                      stroke-linecap="round" fill="none"/>
+
+                <!-- Brillo en el cuerpo -->
+                <path d="M46 80 Q53 75 63 75"
+                      stroke="rgba(255,255,255,0.28)" stroke-width="3"
+                      stroke-linecap="round" fill="none"/>
+            </svg>
+        </div>
+
+        <h1 class="error-title">Algo se quemó en la cocina</h1>
+        <p class="error-description">
+            Nuestro equipo ya está trabajando para apagar el fuego.
+            Disculpá las molestias — volvé en unos minutos e intentá de nuevo.
+        </p>
+        <div class="error-actions">
+            <a href="/" class="btn-primary-custom">
+                <i class="fa-solid fa-house me-2" aria-hidden="true"></i>Volver al inicio
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

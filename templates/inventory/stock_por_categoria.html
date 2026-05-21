@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock por categoría — RestaurApp{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+    overflow: hidden;
+  }
+  .cat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(26,15,8,.1);
+  }
+  .cat-card-header {
+    padding: 1.1rem 1.4rem .8rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+  }
+  .cat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--color-primary-pale);
+    color: var(--color-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .cat-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .cat-meta {
+    font-size: .72rem;
+    color: var(--color-text-muted);
+  }
+  .cat-stats {
+    display: flex;
+    gap: 1.5rem;
+    padding: .75rem 1.4rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: .78rem;
+  }
+  .stat-item { display: flex; flex-direction: column; }
+  .stat-label { font-size: .62rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--color-text-muted); }
+  .stat-value { font-weight: 700; color: var(--color-text); }
+
+  .ing-list { padding: .5rem 0; }
+  .ing-row {
+    padding: .55rem 1.4rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: .75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ing-row:last-child { border-bottom: none; }
+  .ing-name { font-size: .875rem; font-weight: 500; color: var(--color-text); }
+  .ing-unit { font-size: .72rem; color: var(--color-text-muted); }
+  .ing-stock-wrap { min-width: 140px; }
+  .stock-pct-label { font-size: .7rem; font-weight: 600; text-align: right; }
+
+  .consumo-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+  .consumo-title {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+      <h2 class="mb-0">
+        <i class="bi bi-diagram-3 me-2 text-primary-warm"></i>Stock por categoría
+      </h2>
+      <p class="text-muted small mb-0 mt-1">
+        <i class="bi bi-calendar-range me-1"></i>
+        Consumo de los últimos 30 días
+        ({{ fecha_desde|date:"d/m/Y" }} — {{ fecha_hasta|date:"d/m/Y" }})
+      </p>
+    </div>
+    <a href="{% url 'inventory:list' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-boxes me-1"></i>Ver inventario completo
+    </a>
+  </div>
+
+  <!-- Cards por categoría -->
+  {% if categorias %}
+  <div class="row g-4 mb-5">
+    {% for cat in categorias %}
+    <div class="col-md-6 col-xl-4">
+      <div class="cat-card h-100">
+
+        <!-- Header -->
+        <div class="cat-card-header">
+          <div class="cat-icon">
+            <i class="bi bi-tag"></i>
+          </div>
+          <div>
+            <div class="cat-name">{{ cat.nombre }}</div>
+            <div class="cat-meta">{{ cat.total_ingredientes }} ingrediente{{ cat.total_ingredientes|pluralize }}</div>
+          </div>
+          {% if cat.ingredientes_bajo_stock > 0 %}
+          <span class="ms-auto badge-estado estado-cancelado" style="margin-left:auto;">
+            <i class="bi bi-exclamation-triangle me-1"></i>{{ cat.ingredientes_bajo_stock }} bajo
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="cat-stats">
+          <div class="stat-item">
+            <span class="stat-label">Consumido</span>
+            <span class="stat-value">{{ cat.consumo_total|floatformat:1|default:"0" }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Stock total</span>
+            <span class="stat-value">{{ cat.stock_total|floatformat:1|default:"0" }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Bajo stock</span>
+            <span class="stat-value {% if cat.ingredientes_bajo_stock > 0 %}text-danger{% endif %}">
+              {{ cat.ingredientes_bajo_stock }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Ingredientes con progress bar -->
+        <div class="ing-list">
+          {% for ing in cat.ingredientes %}
+          <div class="ing-row">
+            <div>
+              <div class="ing-name">{{ ing.nombre }}</div>
+              <div class="ing-unit">{{ ing.stock_actual }} / mín. {{ ing.stock_minimo }} {{ ing.unidad_medida }}</div>
+            </div>
+            <div class="ing-stock-wrap">
+              {% with pct=ing.porcentaje_stock %}
+              <div class="d-flex justify-content-between mb-1">
+                <small class="text-muted" style="font-size:.65rem;">stock</small>
+                <small class="stock-pct-label
+                  {% if pct < 50 %}text-danger
+                  {% elif pct < 80 %}text-warning
+                  {% else %}text-success{% endif %}">
+                  {{ pct|floatformat:0 }}%
+                </small>
+              </div>
+              <div class="progress rounded-pill" style="height:6px;">
+                <div class="progress-bar rounded-pill
+                     {% if pct < 50 %}bg-danger
+                     {% elif pct < 80 %}bg-warning
+                     {% else %}bg-success{% endif %}"
+                     role="progressbar"
+                     style="width:{{ pct|floatformat:0 }}%;transition:width .8s var(--ease-out);"
+                     aria-valuenow="{{ pct|floatformat:0 }}"
+                     aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+              {% endwith %}
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-3 text-muted" style="font-size:.8rem;">
+            Sin ingredientes en esta categoría.
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="row justify-content-center">
+    <div class="col-md-5 text-center py-5">
+      <i class="bi bi-diagram-3" style="font-size:4rem;color:var(--color-primary);opacity:.2;"></i>
+      <p class="mt-3 fs-5 fw-semibold">No hay categorías con ingredientes.</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Ingredientes más consumidos (top 10, últimos 30 días) -->
+  {% if ingredientes_consumidos %}
+  <div class="consumo-section mb-4">
+    <p class="consumo-title">
+      <i class="bi bi-fire me-1"></i>Ingredientes más consumidos — últimos 30 días
+    </p>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="px-4 py-3">#</th>
+            <th>Ingrediente</th>
+            <th>Categoría de platos</th>
+            <th class="text-center">Unidad</th>
+            <th class="text-end">Consumido</th>
+            <th class="text-end">Stock actual</th>
+            <th class="text-center pe-4">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ing in ingredientes_consumidos %}
+          <tr>
+            <td class="px-4">
+              <span class="rank-num text-muted fw-semibold">{{ forloop.counter }}</span>
+            </td>
+            <td>
+              <a href="{% url 'inventory:detalle_ingrediente' ing.pk %}"
+                 class="fw-semibold text-decoration-none d-block lh-sm">
+                {{ ing.nombre }}
+              </a>
+            </td>
+            <td class="text-muted small">{{ ing.categoria_platos|default:"—" }}</td>
+            <td class="text-center text-muted small">{{ ing.unidad_medida }}</td>
+            <td class="text-end fw-semibold text-danger">
+              {{ ing.cantidad_consumida|floatformat:2 }}
+            </td>
+            <td class="text-end">{{ ing.stock_actual|floatformat:2 }}</td>
+            <td class="text-center pe-4">
+              {% if ing.stock_actual <= ing.stock_minimo %}
+                <span class="badge-estado estado-cancelado">
+                  <i class="bi bi-exclamation-circle me-1"></i>Bajo
+                </span>
+              {% else %}
+                <span class="badge-estado estado-listo">
+                  <i class="bi bi-check-circle me-1"></i>OK
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

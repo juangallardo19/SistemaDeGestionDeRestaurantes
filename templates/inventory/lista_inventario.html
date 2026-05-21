@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventario — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-boxes fs-4 text-primary-warm"></i>
+      <h2 class="mb-0">Inventario</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'inventory:historial' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-clock-history me-1"></i>Historial
+      </a>
+      <a href="{% url 'inventory:registrar_movimiento' %}" class="btn btn-primary-custom btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Registrar movimiento
+      </a>
+    </div>
+  </div>
+
+  <!-- Aviso platos sin receta -->
+  {% if sin_receta_count %}
+  <div class="alert d-flex align-items-center gap-3 mb-3"
+       style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;">
+    <i class="fa-solid fa-triangle-exclamation fs-5 flex-shrink-0" style="color:#D97706;"></i>
+    <div class="flex-grow-1 small">
+      <strong style="color:#92400E;">{{ sin_receta_count }} plato{{ sin_receta_count|pluralize }} sin receta configurada</strong>
+      — el stock no se descontará al pedirlos.
+    </div>
+    <a href="{% url 'inventory:recetas' %}" class="btn btn-sm btn-warning fw-semibold ms-auto">
+      <i class="fa-solid fa-book-open me-1"></i>Configurar recetas
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Filtro stock bajo -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" role="switch"
+             id="switchStockBajo" {% if solo_bajo_stock %}checked{% endif %}>
+      <label class="form-check-label fw-medium" for="switchStockBajo">
+        Mostrar solo ingredientes con stock bajo
+      </label>
+    </div>
+    {% if n_bajo_stock %}
+    <span class="badge bg-danger">
+      <i class="bi bi-exclamation-triangle me-1"></i>{{ n_bajo_stock }} bajo stock
+    </span>
+    {% endif %}
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="tablaInventario">
+          <thead class="table-light">
+            <tr>
+              <th class="px-4 py-3">Ingrediente</th>
+              <th>Unidad</th>
+              <th class="text-end">Stock actual</th>
+              <th class="text-end">Stock mínimo</th>
+              <th style="width:180px;">Nivel</th>
+              <th class="text-center">Estado</th>
+              <th class="text-center pe-4">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ing in ingredientes %}
+            <tr class="{% if ing.stock_bajo %}stock-bajo{% endif %}"
+                data-bajo="{{ ing.stock_bajo|yesno:'true,false' }}">
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                  {% if ing.stock_bajo %}
+                  <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0"
+                     title="Stock bajo"></i>
+                  {% endif %}
+                  <span class="fw-semibold">{{ ing.nombre }}</span>
+                </div>
+              </td>
+              <td class="text-muted small">{{ ing.unidad_medida }}</td>
+              <td class="text-end fw-semibold {% if ing.stock_bajo %}text-danger{% else %}text-success{% endif %}">
+                {{ ing.stock_actual }}
+              </td>
+              <td class="text-end text-muted">{{ ing.stock_minimo }}</td>
+
+              <!-- Barra de progreso dinámica -->
+              <td>
+                <div class="progress rounded-pill" style="height:8px;" title="{{ ing.stock_actual }} / {{ ing.stock_minimo }} mín.">
+                  <div class="progress-bar stock-progress-bar"
+                       role="progressbar"
+                       data-actual="{{ ing.stock_actual }}"
+                       data-minimo="{{ ing.stock_minimo }}"
+                       style="width:0%;transition:width .6s var(--ease-out);"
+                       aria-valuenow="{{ ing.stock_actual }}"
+                       aria-valuemin="0"
+                       aria-valuemax="{{ ing.stock_minimo }}">
+                  </div>
+                </div>
+              </td>
+
+              <!-- Estado -->
+              <td class="text-center">
+                {% if not ing.activo %}
+                  <span class="badge bg-secondary">Inactivo</span>
+                {% elif ing.stock_bajo %}
+                  <span class="badge-estado estado-cancelado">
+                    <i class="bi bi-exclamation-circle me-1"></i>Stock bajo
+                  </span>
+                {% else %}
+                  <span class="badge-estado estado-listo">
+                    <i class="bi bi-check-circle me-1"></i>OK
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Acción -->
+              <td class="text-center pe-4">
+                <a href="{% url 'inventory:registrar_movimiento' %}?ingrediente={{ ing.pk }}"
+                   class="btn btn-sm btn-outline-secondary" title="Registrar movimiento">
+                  <i class="bi bi-arrow-left-right me-1"></i>Movimiento
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>No hay ingredientes registrados.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-muted small mt-2">
+    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+    Las filas resaltadas tienen stock actual igual o inferior al mínimo requerido.
+  </p>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Barras de progreso: rojo ≤ 50%, amarillo ≤ 80%, verde > 80%
+  document.querySelectorAll('.stock-progress-bar').forEach(function (bar) {
+    var actual = parseFloat(bar.dataset.actual) || 0;
+    var minimo = parseFloat(bar.dataset.minimo) || 0;
+    var pct    = minimo > 0 ? Math.min((actual / minimo) * 100, 150) : 100;
+    var pctDisplay = Math.min(pct, 100);
+
+    bar.style.width = pctDisplay + '%';
+    bar.removeAttribute('class');
+    bar.className = 'progress-bar';
+
+    if (pct <= 50) {
+      bar.classList.add('bg-danger');
+    } else if (pct <= 80) {
+      bar.classList.add('bg-warning');
+    } else {
+      bar.classList.add('bg-success');
+    }
+  });
+
+  // Filtro de stock bajo
+  var switchEl = document.getElementById('switchStockBajo');
+  switchEl.addEventListener('change', function () {
+    var soloUnder = this.checked;
+    document.querySelectorAll('#tablaInventario tbody tr[data-bajo]').forEach(function (row) {
+      if (soloUnder && row.dataset.bajo === 'false') {
+        row.hidden = true;
+      } else {
+        row.hidden = false;
+      }
+    });
+  });
+
+  // Aplicar filtro inicial si checkbox está marcado (viene del servidor)
+  if (switchEl.checked) switchEl.dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

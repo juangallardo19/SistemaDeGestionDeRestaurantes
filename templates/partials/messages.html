@@ -1,0 +1,22 @@
+{% if messages %}
+<div class="messages-container" role="alert" aria-live="polite" aria-atomic="false">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show alert-custom shadow-sm"
+         role="alert" data-auto-close>
+        <div class="alert-body">
+            {% if message.tags == 'success' %}
+                <i class="fa-solid fa-circle-check alert-icon" aria-hidden="true"></i>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="fa-solid fa-circle-xmark alert-icon" aria-hidden="true"></i>
+            {% elif message.tags == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation alert-icon" aria-hidden="true"></i>
+            {% else %}
+                <i class="fa-solid fa-circle-info alert-icon" aria-hidden="true"></i>
+            {% endif %}
+            <span class="alert-message">{{ message }}</span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registrar movimiento — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4" style="max-width:660px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'inventory:list' %}">Inventario</a></li>
+      <li class="breadcrumb-item active">Registrar movimiento</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-arrow-left-right fs-4 text-primary-warm"></i>
+    <h2 class="mb-0">Registrar Movimiento</h2>
+  </div>
+
+  <!-- Guía de tipos -->
+  <div class="card border-0 rounded-3 mb-4"
+       style="background:rgba(212,112,10,.07);border-left:3px solid var(--color-primary) !important;">
+    <div class="card-body px-4 py-3">
+      <p class="fw-semibold mb-2"><i class="bi bi-info-circle me-1 text-primary-warm"></i>Tipos de movimiento</p>
+      <div class="row g-2 small text-muted">
+        <div class="col-md-4">
+          <i class="bi bi-plus-circle text-success me-1"></i>
+          <strong>Entrada:</strong> suma al stock (compra de insumos).
+        </div>
+        <div class="col-md-4">
+          <i class="bi bi-dash-circle text-danger me-1"></i>
+          <strong>Salida:</strong> resta del stock (uso, merma).
+        </div>
+        <div class="col-md-4">
+          <i class="bi bi-arrow-repeat text-warning me-1"></i>
+          <strong>Ajuste:</strong> establece el stock a un valor exacto.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body px-4 py-4">
+
+      <!-- Panel de stock actual (se actualiza con JS) -->
+      <div id="stockInfoPanel" class="alert py-2 mb-4 d-none"
+           style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);">
+        <span class="fw-semibold text-success">
+          <i class="bi bi-boxes me-1"></i>
+          Stock actual: <span id="stockActualVal">—</span>
+          <span id="stockUnidadVal" class="text-muted fw-normal"></span>
+        </span>
+        <span class="text-muted small ms-3">
+          (mínimo: <span id="stockMinimoVal">—</span>)
+        </span>
+      </div>
+
+      <!-- Advertencia salida > stock -->
+      <div id="alertaSalidaPanel"
+           class="alert d-flex align-items-start gap-2 d-none mb-3 py-2"
+           style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);" role="alert">
+        <i class="bi bi-exclamation-triangle-fill text-danger mt-1 flex-shrink-0"></i>
+        <span class="text-danger small">
+          <strong>Atención:</strong> la cantidad ingresada supera el stock disponible.
+          El stock quedaría en negativo. Verificá antes de confirmar.
+        </span>
+      </div>
+
+      <form method="post" novalidate id="movimientoForm">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <hr class="my-4">
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary-custom" id="btnRegistrar">
+            <i class="bi bi-check-circle me-2"></i>Registrar movimiento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JSON con stocks de cada ingrediente (inyectado desde el contexto de la vista) -->
+{% if stocks_json %}
+<script id="stocksData" type="application/json">{{ stocks_json }}</script>
+{% endif %}
+
+<script>
+  (function () {
+    // Carga el JSON de stocks si la vista lo provee
+    var stocksData  = {};
+    var dataEl      = document.getElementById('stocksData');
+    if (dataEl) {
+      try { stocksData = JSON.parse(dataEl.textContent); } catch (e) {}
+    }
+
+    var ingSelect       = document.getElementById('id_ingrediente');
+    var tipoSelect      = document.getElementById('id_tipo');
+    var cantidadInput   = document.getElementById('id_cantidad');
+    var stockPanel      = document.getElementById('stockInfoPanel');
+    var alertSalida     = document.getElementById('alertaSalidaPanel');
+    var stockActualEl   = document.getElementById('stockActualVal');
+    var stockMinimoEl   = document.getElementById('stockMinimoVal');
+    var stockUnidadEl   = document.getElementById('stockUnidadVal');
+
+    var currentStock = null;
+
+    function actualizarStockInfo() {
+      if (!ingSelect) return;
+      var pk = ingSelect.value;
+      if (!pk || !stocksData[pk]) {
+        if (stockPanel) stockPanel.classList.add('d-none');
+        currentStock = null;
+        return;
+      }
+
+      var info = stocksData[pk];
+      currentStock = parseFloat(info.stock_actual) || 0;
+
+      if (stockActualEl) stockActualEl.textContent = info.stock_actual;
+      if (stockMinimoEl) stockMinimoEl.textContent = info.stock_minimo;
+      if (stockUnidadEl) stockUnidadEl.textContent = info.unidad_medida || '';
+      if (stockPanel)    stockPanel.classList.remove('d-none');
+
+      verificarSalida();
+    }
+
+    function verificarSalida() {
+      if (!alertSalida || !tipoSelect || !cantidadInput) return;
+      var tipo     = tipoSelect.value;
+      var cantidad = parseFloat(cantidadInput.value) || 0;
+
+      if (tipo === 'salida' && currentStock !== null && cantidad > currentStock) {
+        alertSalida.classList.remove('d-none');
+      } else {
+        alertSalida.classList.add('d-none');
+      }
+    }
+
+    if (ingSelect)     ingSelect.addEventListener('change', actualizarStockInfo);
+    if (tipoSelect)    tipoSelect.addEventListener('change', verificarSalida);
+    if (cantidadInput) cantidadInput.addEventListener('input', verificarSalida);
+
+    // Inicializar si hay ingrediente pre-seleccionado
+    actualizarStockInfo();
+  })();
+</script>
+{% endblock %}

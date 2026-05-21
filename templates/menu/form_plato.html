@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ titulo }} — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 900px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'menu:list' %}">Menú</a></li>
+      <li class="breadcrumb-item active">{{ titulo }}</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="bi bi-journal-plus me-2"></i>{{ titulo }}
+      </h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+          <!-- Columna izquierda: campos principales -->
+          <div class="col-md-7">
+            {{ form.nombre|as_crispy_field }}
+            {{ form.descripcion|as_crispy_field }}
+            <div class="row g-2">
+              <div class="col-sm-6">{{ form.precio|as_crispy_field }}</div>
+              <div class="col-sm-6">{{ form.tiempo_preparacion|as_crispy_field }}</div>
+            </div>
+            {{ form.categoria|as_crispy_field }}
+            <div class="form-check form-switch mb-3">
+              {{ form.disponible }}
+              <label class="form-check-label" for="{{ form.disponible.id_for_label }}">
+                Disponible en el menú
+              </label>
+            </div>
+          </div>
+
+          <!-- Columna derecha: imagen + ingredientes -->
+          <div class="col-md-5">
+
+            <!-- Imagen con preview -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-image me-1"></i>Imagen
+              </label>
+              {{ form.imagen }}
+              {% if form.imagen.errors %}
+              <div class="text-danger small mt-1">{{ form.imagen.errors }}</div>
+              {% endif %}
+              <div id="preview-container" class="mt-2 {% if not objeto or not objeto.imagen %}d-none{% endif %}">
+                <img id="imagen-preview"
+                     src="{% if objeto and objeto.imagen %}{{ objeto.imagen.url }}{% else %}{% endif %}"
+                     alt="Vista previa"
+                     class="img-fluid rounded border shadow-sm"
+                     style="max-height: 220px; object-fit: cover; width: 100%;">
+              </div>
+            </div>
+
+            <!-- Ingredientes con checkboxes -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-list-check me-1"></i>Ingredientes
+              </label>
+              <div class="border rounded p-3 bg-body-secondary"
+                   style="max-height: 270px; overflow-y: auto;">
+                {% if form.ingredientes.field.queryset.exists %}
+                  {% for checkbox in form.ingredientes %}
+                  <div class="form-check">
+                    {{ checkbox.tag }}
+                    <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                      {{ checkbox.choice_label }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                <p class="text-muted small mb-0">No hay ingredientes registrados.</p>
+                {% endif %}
+              </div>
+              {% if form.ingredientes.errors %}
+              <div class="text-danger small mt-1">{{ form.ingredientes.errors }}</div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div><!-- /row -->
+
+        <hr>
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'menu:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i>
+            {% if objeto %}Guardar cambios{% else %}Crear plato{% endif %}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('id_imagen').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      document.getElementById('imagen-preview').src = e.target.result;
+      document.getElementById('preview-container').classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  });
+</script>
+{% endblock %}

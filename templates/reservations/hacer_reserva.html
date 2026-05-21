@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nueva reserva — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4" style="max-width:760px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'reservations:list' %}">Mis reservas</a></li>
+      <li class="breadcrumb-item active">Nueva reserva</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-calendar-plus fs-4 text-primary-warm"></i>
+    <h2 class="mb-0">Nueva Reserva</h2>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body px-4 py-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Fecha y horario -->
+        <h6 class="text-muted text-uppercase fw-semibold small mb-3 letter-spacing-wide">
+          <i class="bi bi-calendar3 me-1"></i>Fecha y horario
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">{{ form.fecha|as_crispy_field }}</div>
+          <div class="col-md-3">{{ form.hora_inicio|as_crispy_field }}</div>
+          <div class="col-md-3">{{ form.hora_fin|as_crispy_field }}</div>
+        </div>
+
+        <!-- Mesa disponible (dinámica vía fetch) -->
+        <h6 class="text-muted text-uppercase fw-semibold small mb-3">
+          <i class="bi bi-table me-1"></i>Mesa disponible
+        </h6>
+
+        <!-- Selector de mesa (se actualiza dinámicamente) -->
+        <div class="mb-2">
+          {{ form.mesa }}
+          {% if form.mesa.errors %}
+          <div class="text-danger small mt-1">{{ form.mesa.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Panel de mesas disponibles con tarjetas -->
+        <div id="mesas-panel" class="mb-4" hidden>
+          <div id="mesas-grid" class="row g-2 mt-1"></div>
+        </div>
+
+        <!-- Mensaje de estado de disponibilidad -->
+        <div id="disponibilidad-msg" class="form-text text-muted mb-4">
+          <i class="bi bi-info-circle me-1"></i>
+          Seleccioná fecha y horario para ver las mesas disponibles.
+        </div>
+
+        <!-- Personas y notas -->
+        <h6 class="text-muted text-uppercase fw-semibold small mb-3">
+          <i class="bi bi-people me-1"></i>Detalles de la reserva
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">{{ form.numero_personas|as_crispy_field }}</div>
+          <div class="col-md-8">{{ form.notas|as_crispy_field }}</div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <hr class="my-3">
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'reservations:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary-custom">
+            <i class="bi bi-calendar-check me-2"></i>Confirmar reserva
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const API_URL     = "{% url 'reservations:disponibilidad_mesas' %}";
+  const mesaSelect  = document.getElementById('id_mesa');
+  const msg         = document.getElementById('disponibilidad-msg');
+  const panel       = document.getElementById('mesas-panel');
+  const grid        = document.getElementById('mesas-grid');
+
+  function ubicacionIcon(ub) {
+    const icons = { interior: 'bi-house-door', exterior: 'bi-sun', terraza: 'bi-tree' };
+    return icons[ub] || 'bi-table';
+  }
+
+  function actualizarMesas() {
+    const fecha      = document.getElementById('id_fecha').value;
+    const horaInicio = document.getElementById('id_hora_inicio').value;
+    const horaFin    = document.getElementById('id_hora_fin').value;
+
+    if (!fecha || !horaInicio || !horaFin) return;
+
+    msg.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Buscando mesas disponibles...';
+    msg.className = 'form-text text-info mb-4';
+    panel.hidden  = true;
+
+    fetch(`${API_URL}?fecha=${fecha}&hora_inicio=${horaInicio}&hora_fin=${horaFin}`)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        const valorActual = mesaSelect.value;
+
+        // Reconstruir el select
+        mesaSelect.innerHTML = '<option value="">— Elegí una mesa —</option>';
+        grid.innerHTML = '';
+
+        if (data.error) {
+          msg.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' + data.error;
+          msg.className = 'form-text text-danger mb-4';
+          panel.hidden  = true;
+          return;
+        }
+
+        if (!data.mesas || data.mesas.length === 0) {
+          msg.innerHTML = '<i class="bi bi-calendar-x me-1"></i>No hay mesas disponibles en ese horario.';
+          msg.className = 'form-text text-danger mb-4';
+          panel.hidden  = true;
+          return;
+        }
+
+        // Poblar select + tarjetas visuales
+        data.mesas.forEach(function (m) {
+          // Option en select
+          const opt = document.createElement('option');
+          opt.value       = m.id;
+          opt.textContent = 'Mesa ' + m.numero + ' — ' + m.ubicacion + ' (cap. ' + m.capacidad + ' pers.)';
+          if (String(m.id) === String(valorActual)) opt.selected = true;
+          mesaSelect.appendChild(opt);
+
+          // Card visual
+          const col  = document.createElement('div');
+          col.className = 'col-sm-6 col-md-4';
+
+          const selected = String(m.id) === String(valorActual);
+          col.innerHTML = `
+            <label class="mesa-card-label d-block h-100 cursor-pointer">
+              <input type="radio" name="_mesa_visual" value="${m.id}"
+                     class="d-none mesa-radio"
+                     ${selected ? 'checked' : ''}>
+              <div class="card border h-100 text-center p-3 mesa-card ${selected ? 'border-primary' : ''}">
+                <i class="bi ${ubicacionIcon(m.ubicacion_slug || 'interior')} fs-4 mb-2 text-primary-warm"></i>
+                <div class="fw-bold">Mesa ${m.numero}</div>
+                <small class="text-muted d-block">${m.ubicacion}</small>
+                <span class="badge bg-light text-dark border mt-2">
+                  <i class="bi bi-people me-1"></i>${m.capacidad} personas
+                </span>
+              </div>
+            </label>`;
+          grid.appendChild(col);
+
+          // Sincronizar tarjeta ↔ select
+          col.querySelector('.mesa-radio').addEventListener('change', function () {
+            mesaSelect.value = this.value;
+            document.querySelectorAll('.mesa-card').forEach(function (c) {
+              c.classList.remove('border-primary');
+            });
+            col.querySelector('.mesa-card').classList.add('border-primary');
+          });
+        });
+
+        // Sincronizar select → tarjeta
+        mesaSelect.addEventListener('change', function () {
+          document.querySelectorAll('.mesa-radio').forEach(function (r) {
+            r.closest('.mesa-card').classList.remove('border-primary');
+            if (r.value === mesaSelect.value) {
+              r.checked = true;
+              r.closest('.mesa-card').classList.add('border-primary');
+            }
+          });
+        });
+
+        msg.innerHTML = '<i class="bi bi-check-circle me-1 text-success"></i>' +
+                        data.mesas.length + ' mesa(s) disponible(s).';
+        msg.className = 'form-text text-success mb-2';
+        panel.hidden  = false;
+      })
+      .catch(function () {
+        msg.innerHTML = '<i class="bi bi-wifi-off me-1"></i>Error al verificar disponibilidad. Intentá de nuevo.';
+        msg.className = 'form-text text-danger mb-4';
+        panel.hidden  = true;
+      });
+  }
+
+  ['id_fecha', 'id_hora_inicio', 'id_hora_fin'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', actualizarMesas);
+  });
+</script>
+{% endblock %}

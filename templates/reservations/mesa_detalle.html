@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Mesa {{ mesa.numero }} — RestaurApp{% endblock %}
+
+{% block extra_css %}
+<style>
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .8rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.badge-pendiente    { background:#FEF9E7; color:#9A7000; }
+.badge-preparacion  { background:var(--color-primary-pale); color:var(--color-primary); }
+.badge-listo        { background:#EAF5EC; color:#2E7D46; }
+
+.pedido-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.pedido-card:hover { box-shadow: 0 4px 16px rgba(26,15,8,.08); }
+
+.pedido-card.listo-card {
+  border-color: #2E7D46;
+  box-shadow: 0 0 0 2px rgba(46,125,70,.12);
+}
+
+.pedido-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .8rem 1.1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: .35rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: .875rem;
+}
+.item-row:last-child { border-bottom: none; }
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .6rem 1.1rem;
+  background: var(--color-cream-dark, #f8f3ee);
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+.action-form { display: inline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <a href="{% url 'reservations:mesas_overview' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Volver
+      </a>
+      <div>
+        <h2 class="mb-0">
+          <i class="fa-solid fa-chair me-2" style="color:var(--color-primary);"></i>
+          Mesa {{ mesa.numero }}
+        </h2>
+        <p class="text-muted small mb-0">
+          {{ mesa.get_ubicacion_display }} · Capacidad {{ mesa.capacidad }}
+        </p>
+      </div>
+    </div>
+    {% if pedidos_activos %}
+    <div class="text-end">
+      <div class="text-muted small">Total en mesa</div>
+      <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--color-primary);">
+        ${{ total_mesa|floatformat:0 }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Reserva de hoy -->
+  {% if reserva_hoy %}
+  <div class="alert d-flex align-items-center gap-3 mb-4"
+       style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:10px;">
+    <i class="fa-solid fa-calendar-check fs-4" style="color:#3B82F6;flex-shrink:0;"></i>
+    <div>
+      <strong>Reserva hoy</strong> —
+      {{ reserva_hoy.cliente.get_full_name|default:reserva_hoy.cliente.username }}
+      · {{ reserva_hoy.hora_inicio|time:"H:i" }}–{{ reserva_hoy.hora_fin|time:"H:i" }}
+      · {{ reserva_hoy.personas }} persona{{ reserva_hoy.personas|pluralize }}
+      <span class="ms-2 badge bg-primary-subtle text-primary-emphasis rounded-pill">
+        {{ reserva_hoy.get_estado_display }}
+      </span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Pedidos activos -->
+  {% if pedidos_activos %}
+  <div class="row g-3">
+    {% for pedido in pedidos_activos %}
+    <div class="col-md-6 col-xl-4">
+      <div class="pedido-card {% if pedido.estado == 'listo' %}listo-card{% endif %}">
+        <div class="pedido-card-header">
+          <span class="fw-bold">#{{ pedido.pk }}</span>
+          <span class="estado-badge
+            {% if pedido.estado == 'pendiente' %}badge-pendiente
+            {% elif pedido.estado == 'en_preparacion' %}badge-preparacion
+            {% else %}badge-listo{% endif %}">
+            {% if pedido.estado == 'pendiente' %}
+              <i class="fa-regular fa-clock"></i>Pendiente
+            {% elif pedido.estado == 'en_preparacion' %}
+              <i class="fa-solid fa-fire"></i>En preparación
+            {% else %}
+              <i class="fa-solid fa-bell"></i>Listo
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="px-3 py-2">
+          <div class="text-muted small mb-2">
+            <i class="fa-solid fa-user me-1"></i>
+            {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}
+            {% if pedido.mesero %}
+            · <i class="fa-solid fa-user-tie ms-1 me-1"></i>
+            {{ pedido.mesero.get_full_name|default:pedido.mesero.username }}
+            {% endif %}
+          </div>
+          <div class="text-muted small mb-3">
+            <i class="fa-regular fa-clock me-1"></i>{{ pedido.fecha_creacion|timesince }} atrás
+          </div>
+
+          <!-- Ítems del pedido -->
+          <div class="mb-2">
+            {% for detalle in pedido.detalles.all %}
+            <div class="item-row">
+              <span>{{ detalle.cantidad }}× {{ detalle.plato.nombre }}</span>
+              <span class="text-muted">${{ detalle.subtotal|floatformat:0 }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="total-row">
+          <span>Total pedido</span>
+          <span style="color:var(--color-primary);">${{ pedido.total|floatformat:0 }}</span>
+        </div>
+
+        <!-- Acción de avance de estado -->
+        <div class="px-3 py-2 d-flex gap-2 justify-content-end">
+          {% if pedido.estado == 'pendiente' %}
+          <form class="action-form" method="post"
+                action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="estado" value="en_preparacion">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="btn btn-sm btn-warning fw-semibold">
+              <i class="fa-solid fa-fire me-1"></i>Preparar
+            </button>
+          </form>
+          <form class="action-form" method="post"
+                action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="estado" value="cancelado">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold"
+                    onclick="return confirm('¿Cancelar este pedido?')">
+              <i class="fa-solid fa-xmark me-1"></i>Cancelar
+            </button>
+          </form>
+
+          {% elif pedido.estado == 'en_preparacion' %}
+          <form class="action-form" method="post"
+                action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="estado" value="listo">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="btn btn-sm btn-success fw-semibold">
+              <i class="fa-solid fa-check me-1"></i>Listo
+            </button>
+          </form>
+
+          {% elif pedido.estado == 'listo' %}
+          <form class="action-form" method="post"
+                action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="estado" value="entregado">
+            <input type="hidden" name="next" value="{% url 'reservations:mesas_overview' %}">
+            <button type="submit" class="btn btn-sm fw-semibold"
+                    style="background:var(--color-primary);color:#fff;">
+              <i class="fa-solid fa-bag-shopping me-1"></i>Entregar
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Mesa libre -->
+  <div class="text-center py-5">
+    <i class="fa-solid fa-circle-check"
+       style="font-size:4rem;color:#2E7D46;opacity:.25;"></i>
+    <p class="mt-3 fs-5 fw-semibold">No hay pedidos activos en esta mesa.</p>
+    <p class="text-muted small">La mesa está libre.</p>
+    {% if user.is_mesero or user.is_admin %}
+    <a href="{% url 'orders:cart' %}" class="btn btn-primary-custom mt-2">
+      <i class="fa-solid fa-cart-plus me-1"></i>Tomar pedido
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

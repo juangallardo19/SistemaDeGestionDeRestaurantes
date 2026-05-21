@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pedido #{{ pedido.pk }} — RestaurApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4" style="max-width:1040px;">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      {% if user.is_admin or user.is_mesero %}
+      <li class="breadcrumb-item"><a href="{% url 'orders:list' %}">Pedidos activos</a></li>
+      {% else %}
+      <li class="breadcrumb-item"><a href="{% url 'orders:mis_pedidos' %}">Mis pedidos</a></li>
+      {% endif %}
+      <li class="breadcrumb-item active">Pedido #{{ pedido.pk }}</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+      <h2 class="mb-1">
+        <i class="bi bi-receipt me-2 text-primary-warm"></i>Pedido #{{ pedido.pk }}
+      </h2>
+      <p class="text-muted mb-0 small">
+        <i class="bi bi-calendar me-1"></i>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}
+        &nbsp;&middot;&nbsp;
+        <i class="bi bi-credit-card me-1"></i>{{ pedido.get_metodo_pago_display }}
+      </p>
+    </div>
+    <span class="badge-estado estado-{{ pedido.estado }} fs-6">
+      {{ pedido.get_estado_display }}
+    </span>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Columna principal: ítems + notas -->
+    <div class="col-md-8">
+
+      <!-- Tabla de ítems -->
+      <div class="card shadow-sm border-0 rounded-3 overflow-hidden mb-3">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold"><i class="bi bi-list-ul me-1"></i>Ítems del pedido</span>
+        </div>
+        <div class="card-body p-0">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="px-4 py-3">Plato</th>
+                <th class="text-center">Cant.</th>
+                <th class="text-end">Precio unit.</th>
+                <th class="text-end pe-4">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detalle in pedido.detalles.all %}
+              <tr>
+                <td class="px-4 py-3">
+                  <span class="fw-semibold d-block lh-sm">{{ detalle.plato.nombre }}</span>
+                  <small class="text-muted">{{ detalle.plato.categoria.nombre }}</small>
+                </td>
+                <td class="text-center">{{ detalle.cantidad }}</td>
+                <td class="text-end text-muted">${{ detalle.precio_unitario }}</td>
+                <td class="text-end pe-4 fw-semibold">${{ detalle.subtotal }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="border-top-2">
+                <td colspan="3" class="px-4 py-3 fw-bold fs-6">Total general</td>
+                <td class="text-end pe-4 fw-bold fs-5 text-primary-warm">${{ pedido.total }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      {% if pedido.notas %}
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Notas del pedido</span>
+        </div>
+        <div class="card-body px-4 py-3">
+          <p class="mb-0 text-muted">{{ pedido.notas }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Columna lateral: info + cambio estado -->
+    <div class="col-md-4">
+
+      <!-- Información -->
+      <div class="card shadow-sm border-0 rounded-3 mb-3">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold"><i class="bi bi-person me-1"></i>Información</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between py-2 px-4">
+            <span class="text-muted small">Cliente</span>
+            <span class="small fw-medium">
+              {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between py-2 px-4">
+            <span class="text-muted small">Mesero</span>
+            <span class="small">
+              {% if pedido.mesero %}
+                {{ pedido.mesero.get_full_name|default:pedido.mesero.username }}
+              {% else %}
+                <span class="text-muted">Sin asignar</span>
+              {% endif %}
+            </span>
+          </li>
+          {% if pedido.mesa %}
+          <li class="list-group-item d-flex justify-content-between py-2 px-4">
+            <span class="text-muted small">Mesa</span>
+            <span class="small fw-medium">Mesa {{ pedido.mesa.numero }}</span>
+          </li>
+          {% endif %}
+          <li class="list-group-item d-flex justify-content-between py-2 px-4">
+            <span class="text-muted small">Actualización</span>
+            <span class="small">{{ pedido.fecha_actualizacion|date:"d/m/Y H:i" }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Cambio de estado inline (mesero/admin) -->
+      {% if user.is_admin or user.is_mesero %}
+      <div class="card shadow-sm border-0 rounded-3 mb-3"
+           style="border-left:3px solid var(--color-primary) !important;">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold">
+            <i class="bi bi-arrow-repeat me-1 text-primary-warm"></i>Cambiar estado
+          </span>
+        </div>
+        <div class="card-body px-4 py-3">
+          <form method="post" action="{% url 'orders:cambiar_estado_pedido' pedido.pk %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_estado" class="form-label fw-semibold small">Nuevo estado</label>
+              <select name="estado" id="id_estado" class="form-select form-select-sm">
+                {% for value, label in pedido.ESTADO_CHOICES %}
+                <option value="{{ value }}"
+                  {% if pedido.estado == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary-custom btn-sm w-100">
+              <i class="bi bi-check-circle me-1"></i>Guardar estado
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Asignar mesero (solo admin) -->
+      {% if asignar_form %}
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-transparent border-bottom py-3 px-4">
+          <span class="fw-semibold">
+            <i class="bi bi-person-badge me-1"></i>Asignar mesero
+          </span>
+        </div>
+        <div class="card-body px-4 py-3">
+          <form method="post">
+            {% csrf_token %}
+            {{ asignar_form|crispy }}
+            <button type="submit" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+              <i class="bi bi-check-circle me-1"></i>Asignar
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
